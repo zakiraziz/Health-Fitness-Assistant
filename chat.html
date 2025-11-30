@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Health Assistant - HealthAI</title>
+    <meta name="description" content="Chat with HealthAI - Get instant answers to your health, fitness, and nutrition questions from our AI assistant.">
+    <meta name="keywords" content="AI health assistant, fitness questions, nutrition advice, health chatbot">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/responsive.css">
+    <style>
+        .chat-typing-indicator {
+            display: none;
+            align-items: center;
+            gap: 10px;
+            padding: 15px;
+            color: var(--gray);
+        }
+        .typing-dots {
+            display: flex;
+            gap: 4px;
+        }
+        .typing-dots span {
+            width: 8px;
+            height: 8px;
+            background: var(--gray);
+            border-radius: 50%;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+        .typing-dots span:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dots span:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes typing {
+            0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header (Same as index.html) -->
+    <header role="banner">
+        <div class="container">
+            <nav class="navbar" role="navigation" aria-label="Main navigation">
+                <div class="logo">
+                    <i class="fas fa-brain" aria-hidden="true"></i>
+                    <span>HealthAI</span>
+                </div>
+                <div class="nav-links">
+                    <a href="index.html">Home</a>
+                    <a href="chat.html" class="active" aria-current="page">AI Assistant</a>
+                    <a href="workouts.html">Workouts</a>
+                    <a href="nutrition.html">Nutrition</a>
+                    <a href="profile.html">Profile</a>
+                </div>
+                <div class="auth-buttons" id="authButtons">
+                    <button class="btn btn-outline" id="loginBtn">Login</button>
+                    <button class="btn btn-primary" id="signupBtn">Sign Up</button>
+                </div>
+                <div class="user-menu" id="userMenu">
+                    <button class="user-avatar" id="userAvatar" aria-label="User menu">JD</button>
+                    <div class="user-dropdown" id="userDropdown" role="menu">
+                        <a href="dashboard.html" role="menuitem"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                        <a href="profile.html" role="menuitem"><i class="fas fa-user"></i> My Profile</a>
+                        <a href="progress.html" role="menuitem"><i class="fas fa-chart-line"></i> Progress</a>
+                        <a href="#" role="menuitem"><i class="fas fa-cog"></i> Settings</a>
+                        <a href="#" id="logoutBtn" role="menuitem"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Auth Modal (Same as index.html) -->
+    <div class="auth-modal" id="authModal">
+        <!-- Same auth modal content as index.html -->
+    </div>
+
+    <!-- Chat Section -->
+    <section class="chat-section" role="main">
+        <div class="container">
+            <div class="chat-container">
+                <div class="chat-header">
+                    <h1>HealthAI Assistant</h1>
+                    <p>Ask me anything about health, fitness, nutrition, or workouts</p>
+                </div>
+                <div class="chat-messages" id="chatMessages" role="log" aria-live="polite">
+                    <div class="message ai-message">
+                        <div class="message-avatar" aria-hidden="true">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <div class="message-content">
+                            <p>Hello! I'm your HealthAI assistant. How can I help you with your health and fitness goals today?</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="chat-typing-indicator" id="typingIndicator">
+                    <div class="message-avatar" aria-hidden="true">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="typing-dots">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                    <span>HealthAI is typing...</span>
+                </div>
+                <div class="chat-input">
+                    <div class="input-container">
+                        <input type="text" id="messageInput" 
+                               placeholder="Type your health or fitness question here..." 
+                               aria-label="Type your message"
+                               maxlength="500">
+                        <button id="sendButton" class="btn btn-primary" aria-label="Send message">
+                            <i class="fas fa-paper-plane" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                    <div class="suggestions">
+                        <p>Try asking:</p>
+                        <div class="suggestion-chips">
+                            <button class="suggestion-chip" data-question="What's a good workout for beginners?">What's a good workout for beginners?</button>
+                            <button class="suggestion-chip" data-question="How can I improve my diet?">How can I improve my diet?</button>
+                            <button class="suggestion-chip" data-question="What are some healthy breakfast ideas?">What are some healthy breakfast ideas?</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer (Same as index.html) -->
+    <footer role="contentinfo">
+        <!-- Same footer content as index.html -->
+    </footer>
+
+    <script src="js/auth.js"></script>
+    <script src="js/chat.js"></script>
+</body>
+</html>

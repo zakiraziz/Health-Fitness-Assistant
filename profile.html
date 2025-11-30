@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - HealthAI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/responsive.css">
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <nav class="navbar">
+                <div class="logo">
+                    <i class="fas fa-brain"></i>
+                    <span>HealthAI</span>
+                </div>
+                <div class="nav-links">
+                    <a href="index.html">Home</a>
+                    <a href="chat.html">AI Assistant</a>
+                    <a href="workouts.html">Workouts</a>
+                    <a href="nutrition.html">Nutrition</a>
+                    <a href="profile.html" class="active">Profile</a>
+                </div>
+                <div class="auth-buttons" id="authButtons">
+                    <button class="btn btn-outline" id="loginBtn">Login</button>
+                    <button class="btn btn-primary" id="signupBtn">Sign Up</button>
+                </div>
+                <div class="user-menu" id="userMenu">
+                    <div class="user-avatar" id="userAvatar">JD</div>
+                    <div class="user-dropdown" id="userDropdown">
+                        <a href="profile.html"><i class="fas fa-user"></i> My Profile</a>
+                        <a href="#"><i class="fas fa-cog"></i> Settings</a>
+                        <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Auth Modal -->
+    <div class="auth-modal" id="authModal">
+        <div class="auth-container">
+            <div class="auth-header">
+                <h2 id="authModalTitle">Welcome to HealthAI</h2>
+                <p id="authModalSubtitle">Your personal health assistant</p>
+            </div>
+            <div class="auth-tabs">
+                <div class="auth-tab active" id="loginTab">Login</div>
+                <div class="auth-tab" id="signupTab">Sign Up</div>
+            </div>
+            <div class="auth-content">
+                <form class="auth-form active" id="loginForm">
+                    <div class="form-group">
+                        <label for="loginEmail">Email</label>
+                        <input type="email" id="loginEmail" placeholder="Enter your email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Password</label>
+                        <input type="password" id="loginPassword" placeholder="Enter your password" required>
+                    </div>
+                    <div class="auth-options">
+                        <div class="remember-me">
+                            <input type="checkbox" id="rememberMe">
+                            <label for="rememberMe">Remember me</label>
+                        </div>
+                        <a href="#" class="forgot-password">Forgot password?</a>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Login</button>
+                    
+                    <div class="social-auth">
+                        <p>Or continue with</p>
+                        <div class="social-buttons">
+                            <div class="social-btn btn-google">
+                                <i class="fab fa-google"></i>
+                            </div>
+                            <div class="social-btn btn-facebook">
+                                <i class="fab fa-facebook-f"></i>
+                            </div>
+                            <div class="social-btn btn-apple">
+                                <i class="fab fa-apple"></i>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                
+                <form class="auth-form" id="signupForm">
+                    <div class="form-group">
+                        <label for="signupName">Full Name</label>
+                        <input type="text" id="signupName" placeholder="Enter your full name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="signupEmail">Email</label>
+                        <input type="email" id="signupEmail" placeholder="Enter your email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="signupPassword">Password</label>
+                        <input type="password" id="signupPassword" placeholder="Create a password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="signupConfirmPassword">Confirm Password</label>
+                        <input type="password" id="signupConfirmPassword" placeholder="Confirm your password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Create Account</button>
+                    
+                    <div class="social-auth">
+                        <p>Or continue with</p>
+                        <div class="social-buttons">
+                            <div class="social-btn btn-google">
+                                <i class="fab fa-google"></i>
+                            </div>
+                            <div class="social-btn btn-facebook">
+                                <i class="fab fa-facebook-f"></i>
+                            </div>
+                            <div class="social-btn btn-apple">
+                                <i class="fab fa-apple"></i>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Section -->
+    <section class="profile-section">
+        <div class="container">
+            <div class="profile-header">
+                <div class="profile-info">
+                    <div class="profile-avatar">
+                        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="User Avatar">
+                        <button class="edit-avatar"><i class="fas fa-camera"></i></button>
+                    </div>
+                    <div class="profile-details">
+                        <h2 id="userName">John Doe</h2>
+                        <p>Member since January 2023</p>
+                        <div class="profile-stats">
+                            <div class="stat">
+                                <span class="stat-value">24</span>
+                                <span class="stat-label">Workouts</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-value">15</span>
+                                <span class="stat-label">Meals Logged</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-value">8</span>
+                                <span class="stat-label">Weeks Active</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button class="btn btn-primary">Edit Profile</button>
+            </div>
+
+            <div class="profile-content">
+                <div class="profile-sidebar">
+                    <div class="sidebar-section">
+                        <h3>Health Metrics</h3>
+                        <div class="metrics">
+                            <div class="metric">
+                                <span class="metric-label">Weight</span>
+                                <span class="metric-value">165 lbs</span>
+                            </div>
+                            <div class="metric">
+                                <span class="metric-label">Height</span>
+                                <span class="metric-value">5'10"</span>
+                            </div>
+                            <div class="metric">
+                                <span class="metric-label">BMI</span>
+                                <span class="metric-value">23.7</span>
+                            </div>
+                            <div class="metric">
+                                <span class="metric-label">Goal Weight</span>
+                                <span class="metric-value">160 lbs</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="sidebar-section">
+                        <h3>Fitness Goals</h3>
+                        <ul class="goals-list">
+                            <li>
+                                <i class="fas fa-running"></i>
+                                <span>Run 5K without stopping</span>
+                                <div class="progress-bar">
+                                    <div class="progress" style="width: 65%"></div>
+                                </div>
+                            </li>
+                            <li>
+                                <i class="fas fa-dumbbell"></i>
+                                <span>Increase bench press by 20%</span>
+                                <div class="progress-bar">
+                                    <div class="progress" style="width: 40%"></div>
+                                </div>
+                            </li>
+                            <li>
+                                <i class="fas fa-apple-alt"></i>
+                                <span>Eat 5 servings of vegetables daily</span>
+                                <div class="progress-bar">
+                                    <div class="progress" style="width: 80%"></div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="profile-main">
+                    <div class="activity-section">
+                        <h3>Recent Activity</h3>
+                        <div class="activity-timeline">
+                            <div class="activity-item">
+                                <div class="activity-icon">
+                                    <i class="fas fa-dumbbell"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <h4>Completed Full Body Workout</h4>
+                                    <p>You finished a 35-minute strength training session</p>
+                                    <span class="activity-time">2 hours ago</span>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-icon">
+                                    <i class="fas fa-utensils"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <h4>Logged Breakfast</h4>
+                                    <p>Oatmeal with berries and almond butter - 320 calories</p>
+                                    <span class="activity-time">5 hours ago</span>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-icon">
+                                    <i class="fas fa-weight"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <h4>Updated Weight</h4>
+                                    <p>You logged your current weight: 165 lbs</p>
+                                    <span class="activity-time">1 day ago</span>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-icon">
+                                    <i class="fas fa-running"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <h4>Completed Cardio Session</h4>
+                                    <p>30 minutes of running at moderate intensity</p>
+                                    <span class="activity-time">2 days ago</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="ai-recommendations">
+                        <h3>HealthAI Recommendations</h3>
+                        <div class="recommendation-card">
+                            <div class="recommendation-icon">
+                                <i class="fas fa-robot"></i>
+                            </div>
+                            <div class="recommendation-content">
+                                <h4>Based on your activity, I recommend:</h4>
+                                <p>Try incorporating more protein in your post-workout meals to support muscle recovery. Consider adding a protein shake after your strength training sessions.</p>
+                                <button class="btn btn-outline">View Details</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="logo">
+                        <i class="fas fa-brain"></i>
+                        <span>HealthAI</span>
+                    </div>
+                    <p>Your personal AI health and fitness assistant for a healthier lifestyle.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="chat.html">AI Assistant</a></li>
+                        <li><a href="workouts.html">Workouts</a></li>
+                        <li><a href="nutrition.html">Nutrition</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Contact Us</h4>
+                    <ul>
+                        <li><i class="fas fa-envelope"></i> support@healthai.com</li>
+                        <li><i class="fas fa-phone"></i> +1 (555) 123-4567</li>
+                        <li><i class="fas fa-map-marker-alt"></i> 123 Fitness St, Health City</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2023 HealthAI. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/auth.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

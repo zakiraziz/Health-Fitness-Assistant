@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Progress - HealthAI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/responsive.css">
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <nav class="navbar">
+                <div class="logo">
+                    <i class="fas fa-brain"></i>
+                    <span>HealthAI</span>
+                </div>
+                <div class="nav-links">
+                    <a href="dashboard.html">Dashboard</a>
+                    <a href="chat.html">AI Assistant</a>
+                    <a href="workouts.html">Workouts</a>
+                    <a href="nutrition.html">Nutrition</a>
+                    <a href="progress.html" class="active">My Progress</a>
+                </div>
+                <div class="auth-buttons" id="authButtons">
+                    <button class="btn btn-outline" id="loginBtn">Login</button>
+                    <button class="btn btn-primary" id="signupBtn">Sign Up</button>
+                </div>
+                <div class="user-menu" id="userMenu">
+                    <div class="user-avatar" id="userAvatar">JD</div>
+                    <div class="user-dropdown" id="userDropdown">
+                        <a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                        <a href="profile.html"><i class="fas fa-user"></i> My Profile</a>
+                        <a href="progress.html"><i class="fas fa-chart-line"></i> Progress</a>
+                        <a href="#"><i class="fas fa-cog"></i> Settings</a>
+                        <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Auth Modal -->
+    <div class="auth-modal" id="authModal">
+        <!-- Same auth modal as previous pages -->
+    </div>
+
+    <!-- Progress Header -->
+    <section class="progress-header">
+        <div class="container">
+            <div class="progress-title">
+                <h1>My Progress Journey</h1>
+                <p>Track your fitness achievements and health improvements</p>
+            </div>
+            <div class="progress-period">
+                <button class="period-btn active">This Week</button>
+                <button class="period-btn">This Month</button>
+                <button class="period-btn">Last 3 Months</button>
+                <button class="period-btn">All Time</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Progress Stats -->
+    <section class="progress-stats">
+        <div class="container">
+            <div class="stats-overview">
+                <div class="overview-card">
+                    <h3>Workout Consistency</h3>
+                    <div class="progress-circle" data-percentage="85">
+                        <span>85%</span>
+                    </div>
+                    <p>12 of 14 planned workouts completed</p>
+                </div>
+                <div class="overview-card">
+                    <h3>Weight Progress</h3>
+                    <div class="progress-number">
+                        <span class="number">-8.5</span>
+                        <span class="unit">lbs</span>
+                    </div>
+                    <p>Since you started 6 weeks ago</p>
+                </div>
+                <div class="overview-card">
+                    <h3>Nutrition Score</h3>
+                    <div class="progress-circle" data-percentage="78">
+                        <span>78%</span>
+                    </div>
+                    <p>Based on your meal logging</p>
+                </div>
+                <div class="overview-card">
+                    <h3>Sleep Quality</h3>
+                    <div class="progress-circle" data-percentage="72">
+                        <span>72%</span>
+                    </div>
+                    <p>Average over the last 7 days</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Progress Charts -->
+    <section class="progress-charts">
+        <div class="container">
+            <h2 class="section-title">Progress Analytics</h2>
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <h3>Weight Trend</h3>
+                    <div class="chart-placeholder">
+                        <p>Weight tracking chart would appear here</p>
+                        <div class="chart-bars">
+                            <div class="bar" style="height: 70%"></div>
+                            <div class="bar" style="height: 65%"></div>
+                            <div class="bar" style="height: 60%"></div>
+                            <div class="bar" style="height: 55%"></div>
+                            <div class="bar" style="height: 50%"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <h3>Workout Frequency</h3>
+                    <div class="chart-placeholder">
+                        <p>Workout frequency chart would appear here</p>
+                        <div class="chart-line">
+                            <div class="point" style="bottom: 30%"></div>
+                            <div class="point" style="bottom: 50%"></div>
+                            <div class="point" style="bottom: 70%"></div>
+                            <div class="point" style="bottom: 80%"></div>
+                            <div class="point" style="bottom: 85%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Achievements -->
+    <section class="achievements">
+        <div class="container">
+            <h2 class="section-title">Your Achievements</h2>
+            <div class="achievements-grid">
+                <div class="achievement-card unlocked">
+                    <div class="achievement-icon">
+                        <i class="fas fa-dumbbell"></i>
+                    </div>
+                    <h3>First Week Complete</h3>
+                    <p>Completed 5 workouts in your first week</p>
+                    <span class="achievement-date">Earned: 2 weeks ago</span>
+                </div>
+                <div class="achievement-card unlocked">
+                    <div class="achievement-icon">
+                        <i class="fas fa-fire"></i>
+                    </div>
+                    <h3>Calorie Burner</h3>
+                    <p>Burned 10,000 total calories</p>
+                    <span class="achievement-date">Earned: 1 week ago</span>
+                </div>
+                <div class="achievement-card locked">
+                    <div class="achievement-icon">
+                        <i class="fas fa-weight"></i>
+                    </div>
+                    <h3>Weight Loss Champion</h3>
+                    <p>Lose 10 pounds total</p>
+                    <span class="achievement-progress">8.5/10 lbs</span>
+                </div>
+                <div class="achievement-card locked">
+                    <div class="achievement-icon">
+                        <i class="fas fa-apple-alt"></i>
+                    </div>
+                    <h3>Nutrition Master</h3>
+                    <p>Log meals for 30 consecutive days</p>
+                    <span class="achievement-progress">18/30 days</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <!-- Same footer as previous pages -->
+    </footer>
+
+    <script src="js/auth.js"></script>
+    <script src="js/progress.js"></script>
+</body>
+</html>

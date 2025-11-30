@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HealthAI - Your Personal Health & Fitness Assistant</title>
+    <meta name="description" content="HealthAI - AI-powered health and fitness assistant. Get personalized workout plans, nutrition advice, and health monitoring.">
+    <meta name="keywords" content="health, fitness, AI assistant, workout, nutrition, exercise">
+    <meta name="author" content="HealthAI">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/responsive.css">
+    <style>
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #6C63FF, #4A47B9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Progress Steps */
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            margin: 25px 0;
+            position: relative;
+        }
+        .progress-steps::before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--light-gray);
+            z-index: 1;
+        }
+        .step {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: var(--light-gray);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gray);
+            font-weight: 600;
+            font-size: 0.9rem;
+            position: relative;
+            z-index: 2;
+        }
+        .step.active {
+            background: var(--primary);
+            color: white;
+        }
+        .step.completed {
+            background: var(--success);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Header -->
+    <header role="banner">
+        <div class="container">
+            <nav class="navbar" role="navigation" aria-label="Main navigation">
+                <div class="logo">
+                    <i class="fas fa-brain" aria-hidden="true"></i>
+                    <span>HealthAI</span>
+                </div>
+                <div class="nav-links">
+                    <a href="index.html" class="active" aria-current="page">Home</a>
+                    <a href="chat.html">AI Assistant</a>
+                    <a href="workouts.html">Workouts</a>
+                    <a href="nutrition.html">Nutrition</a>
+                    <a href="profile.html">Profile</a>
+                </div>
+                <div class="auth-buttons" id="authButtons">
+                    <button class="btn btn-outline" id="loginBtn" aria-label="Login to HealthAI">Login</button>
+                    <button class="btn btn-primary" id="signupBtn" aria-label="Sign up for HealthAI">Sign Up</button>
+                </div>
+                <div class="user-menu" id="userMenu">
+                    <button class="user-avatar" id="userAvatar" aria-label="User menu" aria-expanded="false">JD</button>
+                    <div class="user-dropdown" id="userDropdown" role="menu">
+                        <a href="dashboard.html" role="menuitem"><i class="fas fa-tachometer-alt" aria-hidden="true"></i> Dashboard</a>
+                        <a href="profile.html" role="menuitem"><i class="fas fa-user" aria-hidden="true"></i> My Profile</a>
+                        <a href="progress.html" role="menuitem"><i class="fas fa-chart-line" aria-hidden="true"></i> Progress</a>
+                        <a href="#" role="menuitem"><i class="fas fa-cog" aria-hidden="true"></i> Settings</a>
+                        <a href="#" id="logoutBtn" role="menuitem"><i class="fas fa-sign-out-alt" aria-hidden="true"></i> Logout</a>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Auth Modal -->
+    <div class="auth-modal" id="authModal" role="dialog" aria-labelledby="authModalTitle" aria-hidden="true">
+        <div class="auth-container">
+            <div class="auth-header">
+                <h2 id="authModalTitle">Welcome to HealthAI</h2>
+                <p id="authModalSubtitle">Your personal health assistant</p>
+                <button class="close-auth" id="closeAuth" aria-label="Close authentication modal">&times;</button>
+            </div>
+            
+            <!-- Progress Steps for Signup -->
+            <div class="progress-steps" id="progressSteps" style="display: none;">
+                <div class="step active" id="step1">1</div>
+                <div class="step" id="step2">2</div>
+                <div class="step" id="step3">3</div>
+            </div>
+            
+            <div class="auth-tabs" role="tablist">
+                <button class="auth-tab active" id="loginTab" role="tab" aria-selected="true" aria-controls="loginForm">Login</button>
+                <button class="auth-tab" id="signupTab" role="tab" aria-selected="false" aria-controls="signupForm">Sign Up</button>
+            </div>
+            
+            <div class="auth-content">
+                <!-- Login Form -->
+                <form class="auth-form active" id="loginForm" role="tabpanel" aria-labelledby="loginTab">
+                    <div class="form-group">
+                        <label for="loginEmail">Email</label>
+                        <input type="email" id="loginEmail" placeholder="Enter your email" required aria-required="true">
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Password</label>
+                        <input type="password" id="loginPassword" placeholder="Enter your password" required aria-required="true">
+                    </div>
+                    <div class="auth-options">
+                        <div class="remember-me">
+                            <input type="checkbox" id="rememberMe">
+                            <label for="rememberMe">Remember me</label>
+                        </div>
+                        <a href="#" class="forgot-password">Forgot password?</a>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Login</button>
+                    
+                    <div class="social-auth">
+                        <p>Or continue with</p>
+                        <div class="social-buttons">
+                            <button type="button" class="social-btn btn-google" aria-label="Sign in with Google">
+                                <i class="fab fa-google" aria-hidden="true"></i>
+                            </button>
+                            <button type="button" class="social-btn btn-facebook" aria-label="Sign in with Facebook">
+                                <i class="fab fa-facebook-f" aria-hidden="true"></i>
+                            </button>
+                            <button type="button" class="social-btn btn-apple" aria-label="Sign in with Apple">
+                                <i class="fab fa-apple" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+                
+                <!-- Basic Signup Form -->
+                <form class="auth-form" id="signupForm" role="tabpanel" aria-labelledby="signupTab" hidden>
+                    <div class="form-group">
+                        <label for="signupName">Full Name</label>
+                        <input type="text" id="signupName" placeholder="Enter your full name" required aria-required="true">
+                    </div>
+                    <div class="form-group">
+                        <label for="signupEmail">Email</label>
+                        <input type="email" id="signupEmail" placeholder="Enter your email" required aria-required="true">
+                    </div>
+                    <div class="form-group">
+                        <label for="signupPassword">Password</label>
+                        <input type="password" id="signupPassword" placeholder="Create a password" required aria-required="true" minlength="6">
+                    </div>
+                    <div class="form-group">
+                        <label for="signupConfirmPassword">Confirm Password</label>
+                        <input type="password" id="signupConfirmPassword" placeholder="Confirm your password" required aria-required="true">
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Continue to Health Details</button>
+                    
+                    <div class="social-auth">
+                        <p>Or continue with</p>
+                        <div class="social-buttons">
+                            <button type="button" class="social-btn btn-google" aria-label="Sign up with Google">
+                                <i class="fab fa-google" aria-hidden="true"></i>
+                            </button>
+                            <button type="button" class="social-btn btn-facebook" aria-label="Sign up with Facebook">
+                                <i class="fab fa-facebook-f" aria-hidden="true"></i>
+                            </button>
+                            <button type="button" class="social-btn btn-apple" aria-label="Sign up with Apple">
+                                <i class="fab fa-apple" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+                
+                <!-- Health Details Form -->
+                <form class="auth-form" id="healthDetailsForm" hidden>
+                    <h3 style="margin-bottom: 20px; color: var(--secondary);">Tell us about yourself</h3>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="userAge">Age</label>
+                            <input type="number" id="userAge" min="13" max="100" placeholder="Your age" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="userGender">Gender</label>
+                            <select id="userGender" required>
+                                <option value="">Select Gender</option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                                <option value="other">Other</option>
+                                <option value="prefer-not-to-say">Prefer not to say</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="userHeight">Height (cm)</label>
+                            <input type="number" id="userHeight" min="100" max="250" placeholder="Your height" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="userWeight">Weight (kg)</label>
+                            <input type="number" id="userWeight" min="30" max="300" step="0.1" placeholder="Your weight" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="userFitnessLevel">Fitness Level</label>
+                        <select id="userFitnessLevel" required>
+                            <option value="">Select your fitness level</option>
+                            <option value="beginner">Beginner - New to exercise</option>
+                            <option value="intermediate">Intermediate - Exercise occasionally</option>
+                            <option value="advanced">Advanced - Regular exerciser</option>
+                            <option value="athlete">Athlete - Competitive training</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Fitness Goals (Select all that apply)</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="goals" value="weight-loss"> 
+                                <span class="checkmark"></span>
+                                Weight Loss
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="goals" value="muscle-gain">
+                                <span class="checkmark"></span>
+                                Muscle Building
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="goals" value="endurance">
+                                <span class="checkmark"></span>
+                                Endurance
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="goals" value="flexibility">
+                                <span class="checkmark"></span>
+                                Flexibility
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="goals" value="general-health">
+                                <span class="checkmark"></span>
+                                General Health
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="userActivity">Daily Activity Level</label>
+                        <select id="userActivity" required>
+                            <option value="">Select your activity level</option>
+                            <option value="sedentary">Sedentary (little to no exercise)</option>
+                            <option value="light">Light (light exercise 1-3 days/week)</option>
+                            <option value="moderate">Moderate (moderate exercise 3-5 days/week)</option>
+                            <option value="active">Active (hard exercise 6-7 days/week)</option>
+                            <option value="very-active">Very Active (physical job + exercise)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-outline" id="backToSignup">Back</button>
+                        <button type="submit" class="btn btn-primary">Continue to Goals</button>
+                    </div>
+                </form>
+                
+                <!-- Fitness Goals Form -->
+                <form class="auth-form" id="fitnessGoalsForm" hidden>
+                    <h3 style="margin-bottom: 20px; color: var(--secondary);">Set Your Fitness Goals</h3>
+                    
+                    <div class="form-group">
+                        <label for="targetWeight">Target Weight (kg)</label>
+                        <input type="number" id="targetWeight" min="30" max="300" step="0.1" placeholder="Your target weight">
+                        <small>Leave blank if you don't have a specific weight goal</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="workoutFrequency">Workout Frequency</label>
+                        <select id="workoutFrequency" required>
+                            <option value="">How often do you want to exercise?</option>
+                            <option value="1-2">1-2 times per week</option>
+                            <option value="3-4">3-4 times per week</option>
+                            <option value="5-6">5-6 times per week</option>
+                            <option value="daily">Daily</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="workoutDuration">Preferred Workout Duration</label>
+                        <select id="workoutDuration" required>
+                            <option value="">Select preferred duration</option>
+                            <option value="15-30">15-30 minutes</option>
+                            <option value="30-45">30-45 minutes</option>
+                            <option value="45-60">45-60 minutes</option>
+                            <option value="60+">60+ minutes</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="availableEquipment">Available Equipment</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="equipment" value="bodyweight">
+                                <span class="checkmark"></span>
+                                Bodyweight only
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="equipment" value="dumbbells">
+                                <span class="checkmark"></span>
+                                Dumbbells
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="equipment" value="resistance-bands">
+                                <span class="checkmark"></span>
+                                Resistance Bands
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="equipment" value="yoga-mat">
+                                <span class="checkmark"></span>
+                                Yoga Mat
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="equipment" value="full-gym">
+                                <span class="checkmark"></span>
+                                Full Gym Access
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="dietaryPreference">Dietary Preference</label>
+                        <select id="dietaryPreference" required>
+                            <option value="">Select your dietary preference</option>
+                            <option value="balanced">Balanced</option>
+                            <option value="vegetarian">Vegetarian</option>
+                            <option value="vegan">Vegan</option>
+                            <option value="keto">Keto</option>
+                            <option value="paleo">Paleo</option>
+                            <option value="mediterranean">Mediterranean</option>
+                            <option value="no-restriction">No Restrictions</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-outline" id="backToHealth">Back</button>
+                        <button type="submit" class="btn btn-primary">Complete Registration</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero" role="region" aria-labelledby="hero-title">
+        <div class="container">
+            <div class="hero-content">
+                <h1 id="hero-title">Your Personal AI Health & Fitness Assistant</h1>
+                <p>Get personalized workout plans, nutrition advice, and health insights powered by artificial intelligence.</p>
+                <div class="hero-buttons">
+                    <a href="chat.html" class="btn btn-primary">Ask HealthAI</a>
+                    <a href="workouts.html" class="btn btn-outline">View Workouts</a>
+                </div>
+            </div>
+            <div class="hero-image">
+                <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Person exercising with fitness equipment" loading="lazy">
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" role="region" aria-labelledby="features-title">
+        <div class="container">
+            <h2 id="features-title" class="section-title">How HealthAI Can Help You</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-dumbbell" aria-hidden="true"></i>
+                    </div>
+                    <h3>Personalized Workouts</h3>
+                    <p>Get workout plans tailored to your fitness level, goals, and available equipment.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-apple-alt" aria-hidden="true"></i>
+                    </div>
+                    <h3>Nutrition Guidance</h3>
+                    <p>Receive meal plans and nutrition advice based on your dietary preferences and health goals.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-stethoscope" aria-hidden="true"></i>
+                    </div>
+                    <h3>Health Monitoring</h3>
+                    <p>Track your progress and get insights about your health metrics and improvements.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-robot" aria-hidden="true"></i>
+                    </div>
+                    <h3>AI-Powered Assistant</h3>
+                    <p>Ask any health-related questions and get instant, reliable answers from our AI.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="testimonials" role="region" aria-labelledby="testimonials-title">
+        <div class="container">
+            <h2 id="testimonials-title" class="section-title">What Our Users Say</h2>
+            <div class="testimonials-grid">
+                <div class="testimonial-card">
+                    <div class="testimonial-content">
+                        <p>"HealthAI helped me lose 15 pounds in 3 months with personalized workout and nutrition plans!"</p>
+                    </div>
+                    <div class="testimonial-author">
+                        <img src="https://images.unsplash.com/photo-1494790108755-2616b612b786?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&q=80" alt="Sarah Johnson" loading="lazy">
+                        <div>
+                            <h4>Sarah Johnson</h4>
+                            <span>Fitness Enthusiast</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="testimonial-content">
+                        <p>"The AI assistant answered all my health questions accurately. It's like having a personal trainer and nutritionist!"</p>
+                    </div>
+                    <div class="testimonial-author">
+                        <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&q=80" alt="Mike Thompson" loading="lazy">
+                        <div>
+                            <h4>Mike Thompson</h4>
+                            <span>Busy Professional</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer role="contentinfo">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="logo">
+                        <i class="fas fa-brain" aria-hidden="true"></i>
+                        <span>HealthAI</span>
+                    </div>
+                    <p>Your personal AI health and fitness assistant for a healthier lifestyle.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="chat.html">AI Assistant</a></li>
+                        <li><a href="workouts.html">Workouts</a></li>
+                        <li><a href="nutrition.html">Nutrition</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Contact Us</h4>
+                    <ul>
+                        <li><i class="fas fa-envelope" aria-hidden="true"></i> support@healthai.com</li>
+                        <li><i class="fas fa-phone" aria-hidden="true"></i> +1 (555) 123-4567</li>
+                        <li><i class="fas fa-map-marker-alt" aria-hidden="true"></i> 123 Fitness St, Health City</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2023 HealthAI. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="js/auth.js"></script>
+    <script>
+        // Remove loading screen when page loads
+        window.addEventListener('load', function() {
+            const loadingScreen = document.getElementById('loadingScreen');
+            if (loadingScreen) {
+                loadingScreen.style.opacity = '0';
+                setTimeout(() => {
+                    loadingScreen.remove();
+                }, 500);
+            }
+        });
+
+        // Fallback if load event doesn't fire
+        setTimeout(() => {
+            const loadingScreen = document.getElementById('loadingScreen');
+            if (loadingScreen) {
+                loadingScreen.style.opacity = '0';
+                setTimeout(() => {
+                    loadingScreen.remove();
+                }, 500);
+            }
+        }, 3000);
+    </script>
+</body>
+</html>

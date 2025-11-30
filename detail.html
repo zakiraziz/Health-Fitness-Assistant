@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workout Details - HealthAI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/responsive.css">
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <nav class="navbar">
+                <div class="logo">
+                    <i class="fas fa-brain"></i>
+                    <span>HealthAI</span>
+                </div>
+                <div class="nav-links">
+                    <a href="dashboard.html">Dashboard</a>
+                    <a href="chat.html">AI Assistant</a>
+                    <a href="workouts.html">Workouts</a>
+                    <a href="nutrition.html">Nutrition</a>
+                    <a href="progress.html">My Progress</a>
+                </div>
+                <div class="auth-buttons" id="authButtons">
+                    <button class="btn btn-outline" id="loginBtn">Login</button>
+                    <button class="btn btn-primary" id="signupBtn">Sign Up</button>
+                </div>
+                <div class="user-menu" id="userMenu">
+                    <div class="user-avatar" id="userAvatar">JD</div>
+                    <div class="user-dropdown" id="userDropdown">
+                        <a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                        <a href="profile.html"><i class="fas fa-user"></i> My Profile</a>
+                        <a href="progress.html"><i class="fas fa-chart-line"></i> Progress</a>
+                        <a href="#"><i class="fas fa-cog"></i> Settings</a>
+                        <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Workout Detail Section -->
+    <section class="workout-detail-section">
+        <div class="container">
+            <div class="workout-header">
+                <div class="workout-hero">
+                    <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Full Body Workout">
+                    <div class="workout-info">
+                        <span class="workout-level beginner">Beginner</span>
+                        <h1>Full Body Beginner Workout</h1>
+                        <p>A complete full-body workout perfect for those just starting their fitness journey.</p>
+                        <div class="workout-meta">
+                            <span><i class="fas fa-clock"></i> 30 minutes</span>
+                            <span><i class="fas fa-dumbbell"></i> Bodyweight</span>
+                            <span><i class="fas fa-fire"></i> 240 calories</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="workout-content">
+                <div class="workout-sidebar">
+                    <div class="workout-stats">
+                        <h3>Workout Summary</h3>
+                        <div class="stat">
+                            <span class="label">Duration</span>
+                            <span class="value">30 min</span>
+                        </div>
+                        <div class="stat">
+                            <span class="label">Exercises</span>
+                            <span class="value">8</span>
+                        </div>
+                        <div class="stat">
+                            <span class="label">Difficulty</span>
+                            <span class="value">Beginner</span>
+                        </div>
+                        <div class="stat">
+                            <span class="label">Equipment</span>
+                            <span class="value">None</span>
+                        </div>
+                    </div>
+
+                    <div class="workout-actions">
+                        <button class="btn btn-primary start-workout-btn">
+                            <i class="fas fa-play"></i> Start Workout
+                        </button>
+                        <button class="btn btn-outline">
+                            <i class="fas fa-bookmark"></i> Save for Later
+                        </button>
+                    </div>
+                </div>
+
+                <div class="workout-main">
+                    <div class="workout-description">
+                        <h2>About This Workout</h2>
+                        <p>This full-body workout is designed for beginners who want to build a solid fitness foundation. It focuses on fundamental movements that engage multiple muscle groups, helping you build strength and improve overall fitness.</p>
+                    </div>
+
+                    <div class="exercises-section">
+                        <h2>Exercises (8)</h2>
+                        <div class="exercises-list">
+                            <div class="exercise-item">
+                                <div class="exercise-number">1</div>
+                                <div class="exercise-details">
+                                    <h3>Bodyweight Squats</h3>
+                                    <p>3 sets × 12 reps • 60s rest</p>
+                                    <span class="exercise-muscles">Quads, Glutes, Core</span>
+                                </div>
+                                <button class="exercise-demo-btn">
+                                    <i class="fas fa-play-circle"></i> Demo
+                                </button>
+                            </div>
+
+                            <div class="exercise-item">
+                                <div class="exercise-number">2</div>
+                                <div class="exercise-details">
+                                    <h3>Push-ups (Knee)</h3>
+                                    <p>3 sets × 10 reps • 45s rest</p>
+                                    <span class="exercise-muscles">Chest, Shoulders, Triceps</span>
+                                </div>
+                                <button class="exercise-demo-btn">
+                                    <i class="fas fa-play-circle"></i> Demo
+                                </button>
+                            </div>
+
+                            <div class="exercise-item">
+                                <div class="exercise-number">3</div>
+                                <div class="exercise-details">
+                                    <h3>Plank</h3>
+                                    <p>3 sets × 30 seconds • 30s rest</p>
+                                    <span class="exercise-muscles">Core, Shoulders</span>
+                                </div>
+                                <button class="exercise-demo-btn">
+                                    <i class="fas fa-play-circle"></i> Demo
+                                </button>
+                            </div>
+
+                            <div class="exercise-item">
+                                <div class="exercise-number">4</div>
+                                <div class="exercise-details">
+                                    <h3>Glute Bridges</h3>
+                                    <p>3 sets × 15 reps • 45s rest</p>
+                                    <span class="exercise-muscles">Glutes, Hamstrings</span>
+                                </div>
+                                <button class="exercise-demo-btn">
+                                    <i class="fas fa-play-circle"></i> Demo
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="workout-tips">
+                        <h2>Pro Tips</h2>
+                        <div class="tips-grid">
+                            <div class="tip">
+                                <i class="fas fa-lightbulb"></i>
+                                <p>Focus on proper form rather than speed. Quality over quantity!</p>
+                            </div>
+                            <div class="tip">
+                                <i class="fas fa-tint"></i>
+                                <p>Stay hydrated throughout your workout. Drink water between sets.</p>
+                            </div>
+                            <div class="tip">
+                                <i class="fas fa-wind"></i>
+                                <p>Breathe consistently - exhale during exertion, inhale during relaxation.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+   <!-- Workout Timer Modal -->
+<div class="workout-timer-modal" id="workoutTimerModal">
+    <div class="timer-container">
+        <div class="timer-header">
+            <h2>Workout in Progress</h2>
+            <button class="close-timer">&times;</button>
+        </div>
+        <div class="timer-content">
+            <div class="current-exercise">
+                <h3>Bodyweight Squats</h3>
+                <p>Set 1 of 3</p>
+            </div>
+            <div class="timer-display">
+                <div class="time-circle">
+                    <span class="time">00:30</span>
+                    <div class="timer-progress"></div>
+                </div>
+            </div>
+            <div class="timer-controls">
+                <button class="btn btn-outline" id="pauseTimer">
+                    <i class="fas fa-pause"></i> Pause
+                </button>
+                <button class="btn btn-primary" id="nextExercise">
+                    <i class="fas fa-forward"></i> Next Set
+                </button>
+            </div>
+            <div class="exercise-progress">
+                <div class="progress-bar">
+                    <div class="progress" style="width: 0%"></div>
+                </div>
+                <span>1 of 4 exercises</span>
+            </div>
+            <div class="workout-stats">
+                <div class="stat">
+                    <span class="stat-value">12</span>
+                    <span class="stat-label">Reps</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-value">3</span>
+                    <span class="stat-label">Sets</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-value">45s</span>
+                    <span class="stat-label">Work</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-value">60s</span>
+                    <span class="stat-label">Rest</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="logo">
+                        <i class="fas fa-brain"></i>
+                        <span>HealthAI</span>
+                    </div>
+                    <p>Your personal AI health and fitness assistant for a healthier lifestyle.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="dashboard.html">Dashboard</a></li>
+                        <li><a href="chat.html">AI Assistant</a></li>
+                        <li><a href="workouts.html">Workouts</a></li>
+                        <li><a href="nutrition.html">Nutrition</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Contact Us</h4>
+                    <ul>
+                        <li><i class="fas fa-envelope"></i> support@healthai.com</li>
+                        <li><i class="fas fa-phone"></i> +1 (555) 123-4567</li>
+                        <li><i class="fas fa-map-marker-alt"></i> 123 Fitness St, Health City</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2023 HealthAI. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/auth.js"></script>
+    <script src="js/workout-detail.js"></script>
+    <script>
+// Initialize workout instructions
+document.addEventListener('DOMContentLoaded', function() {
+    // Start workout buttons with instructions
+    document.querySelectorAll('.start-workout-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const workoutId = this.getAttribute('data-workout');
+            workoutInstructions.showWorkoutInstructions(workoutId);
+        });
+    });
+
+    // Update workout detail page start button
+    const startWorkoutBtn = document.querySelector('.start-workout-btn');
+    if (startWorkoutBtn && !startWorkoutBtn.getAttribute('data-workout')) {
+        startWorkoutBtn.setAttribute('data-workout', 'fullbody-beginner');
+    }
+});
+</script>
+</body>
+</html>

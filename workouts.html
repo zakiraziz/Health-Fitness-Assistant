@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workouts - HealthAI</title>
+    <meta name="description" content="Browse personalized workout plans and fitness programs tailored to your goals and fitness level.">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/responsive.css">
+</head>
+<body>
+    <!-- Header -->
+    <header role="banner">
+        <div class="container">
+            <nav class="navbar" role="navigation" aria-label="Main navigation">
+                <div class="logo">
+                    <i class="fas fa-brain" aria-hidden="true"></i>
+                    <span>HealthAI</span>
+                </div>
+                <div class="nav-links">
+                    <a href="index.html">Home</a>
+                    <a href="chat.html">AI Assistant</a>
+                    <a href="workouts.html" class="active" aria-current="page">Workouts</a>
+                    <a href="nutrition.html">Nutrition</a>
+                    <a href="profile.html">Profile</a>
+                    <!-- Update the Start Workout buttons to use instructions -->
+<button class="btn btn-primary start-workout-btn" data-workout="fullbody-beginner">
+    <i class="fas fa-play-circle"></i> Start Workout
+</button>
+                </div>
+                <div class="auth-buttons" id="authButtons">
+                    <button class="btn btn-outline" id="loginBtn">Login</button>
+                    <button class="btn btn-primary" id="signupBtn">Sign Up</button>
+                </div>
+                <div class="user-menu" id="userMenu">
+                    <button class="user-avatar" id="userAvatar" aria-label="User menu">JD</button>
+                    <div class="user-dropdown" id="userDropdown" role="menu">
+                        <a href="dashboard.html" role="menuitem"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                        <a href="profile.html" role="menuitem"><i class="fas fa-user"></i> My Profile</a>
+                        <a href="progress.html" role="menuitem"><i class="fas fa-chart-line"></i> Progress</a>
+                        <a href="#" role="menuitem"><i class="fas fa-cog"></i> Settings</a>
+                        <a href="#" id="logoutBtn" role="menuitem"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Auth Modal -->
+    <div class="auth-modal" id="authModal">
+        <!-- Same auth modal as index.html -->
+    </div>
+
+    <!-- Workout Plan Modal -->
+    <div class="workout-plan-modal" id="workoutPlanModal">
+        <div class="plan-modal-container">
+            <div class="plan-modal-header">
+                <h2 id="planModalTitle">Workout Plan</h2>
+                <button class="close-plan-modal" id="closePlanModal">&times;</button>
+            </div>
+            <div class="plan-modal-content">
+                <div class="plan-overview">
+                    <div class="plan-hero">
+                        <img id="planImage" src="" alt="">
+                        <div class="plan-basic-info">
+                            <h3 id="planWorkoutName">Workout Name</h3>
+                            <div class="plan-meta">
+                                <span id="planDuration"><i class="fas fa-clock"></i> Duration</span>
+                                <span id="planLevel"><i class="fas fa-signal"></i> Level</span>
+                                <span id="planCalories"><i class="fas fa-fire"></i> Calories</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="plan-details-grid">
+                        <div class="plan-schedule">
+                            <h4>Weekly Schedule</h4>
+                            <div class="weekly-schedule">
+                                <div class="schedule-day active" data-day="monday">
+                                    <span class="day-name">Mon</span>
+                                    <span class="day-workout">Full Body</span>
+                                </div>
+                                <div class="schedule-day" data-day="tuesday">
+                                    <span class="day-name">Tue</span>
+                                    <span class="day-workout">Cardio</span>
+                                </div>
+                                <div class="schedule-day" data-day="wednesday">
+                                    <span class="day-name">Wed</span>
+                                    <span class="day-workout">Recovery</span>
+                                </div>
+                                <div class="schedule-day" data-day="thursday">
+                                    <span class="day-name">Thu</span>
+                                    <span class="day-workout">Upper Body</span>
+                                </div>
+                                <div class="schedule-day" data-day="friday">
+                                    <span class="day-name">Fri</span>
+                                    <span class="day-workout">Lower Body</span>
+                                </div>
+                                <div class="schedule-day" data-day="saturday">
+                                    <span class="day-name">Sat</span>
+                                    <span class="day-workout">Cardio</span>
+                                </div>
+                                <div class="schedule-day" data-day="sunday">
+                                    <span class="day-name">Sun</span>
+                                    <span class="day-workout">Rest</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="plan-stats">
+                            <h4>Plan Statistics</h4>
+                            <div class="stats-grid">
+                                <div class="stat-item">
+                                    <span class="stat-value" id="totalWorkouts">5</span>
+                                    <span class="stat-label">Workouts/Week</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-value" id="totalDuration">225</span>
+                                    <span class="stat-label">Total Minutes</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-value" id="totalCalories">1,500</span>
+                                    <span class="stat-label">Calories/Week</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-value" id="planProgress">0%</span>
+                                    <span class="stat-label">Your Progress</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="daily-workout-detail" id="dailyWorkoutDetail">
+                    <h4>Today's Workout: <span id="currentDayWorkout">Full Body Strength</span></h4>
+                    <div class="exercise-list">
+                        <div class="exercise-item">
+                            <div class="exercise-header">
+                                <span class="exercise-number">1</span>
+                                <h5>Warm-up</h5>
+                                <span class="exercise-time">10 min</span>
+                            </div>
+                            <p>Dynamic stretching and light cardio to prepare your body</p>
+                        </div>
+                        <div class="exercise-item">
+                            <div class="exercise-header">
+                                <span class="exercise-number">2</span>
+                                <h5>Bodyweight Squats</h5>
+                                <span class="exercise-sets">3 sets × 12 reps</span>
+                            </div>
+                            <p>Focus on proper form and full range of motion</p>
+                        </div>
+                        <div class="exercise-item">
+                            <div class="exercise-header">
+                                <span class="exercise-number">3</span>
+                                <h5>Push-ups</h5>
+                                <span class="exercise-sets">3 sets × 10 reps</span>
+                            </div>
+                            <p>Modified on knees if needed</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="plan-actions">
+                    <button class="btn btn-primary start-plan-workout">
+                        <i class="fas fa-play"></i> Start Today's Workout
+                    </button>
+                    <button class="btn btn-outline save-plan">
+                        <i class="fas fa-bookmark"></i> Save Plan
+                    </button>
+                    <button class="btn btn-outline share-plan">
+                        <i class="fas fa-share"></i> Share
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Workouts Section -->
+    <section class="workouts-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Personalized Workout Plans</h2>
+                <p>Choose from our AI-generated workout plans or create your own custom plan</p>
+            </div>
+
+            <!-- Workout Stats -->
+            <div class="workout-stats-overview">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-dumbbell"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="totalWorkouts">24</h3>
+                        <p>Total Workouts Available</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="avgDuration">35</h3>
+                        <p>Average Duration (mins)</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-fire"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="caloriesAvg">280</h3>
+                        <p>Avg Calories Burned</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="workout-filters">
+                <button class="filter-btn active" data-filter="all">All Workouts</button>
+                <button class="filter-btn" data-filter="beginner">Beginner</button>
+                <button class="filter-btn" data-filter="intermediate">Intermediate</button>
+                <button class="filter-btn" data-filter="advanced">Advanced</button>
+                <button class="filter-btn" data-filter="cardio">Cardio</button>
+                <button class="filter-btn" data-filter="strength">Strength</button>
+                <button class="filter-btn" data-filter="yoga">Yoga & Flexibility</button>
+            </div>
+
+            <div class="workouts-grid">
+                <!-- Full Body Beginner -->
+                <div class="workout-card" data-level="beginner" data-type="strength">
+                    <div class="workout-image">
+                        <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Full Body Workout">
+                        <span class="workout-level beginner">Beginner</span>
+                        <div class="workout-badge">
+                            <i class="fas fa-star"></i> Most Popular
+                        </div>
+                    </div>
+                    <div class="workout-content">
+                        <h3>Full Body Beginner</h3>
+                        <p>A complete full-body workout perfect for those just starting their fitness journey.</p>
+                        <div class="workout-details">
+                            <span><i class="fas fa-clock"></i> 30 mins</span>
+                            <span><i class="fas fa-dumbbell"></i> Bodyweight</span>
+                            <span><i class="fas fa-fire"></i> 240 cal</span>
+                        </div>
+                        <div class="workout-rating">
+                            <div class="stars">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star-half-alt"></i>
+                            </div>
+                            <span>4.5 (128 reviews)</span>
+                        </div>
+                        <div class="workout-actions">
+                            <a href="workout-detail.html?workout=fullbody-beginner" class="btn btn-primary">
+                                <i class="fas fa-play-circle"></i> Start Workout
+                            </a>
+                            <button class="btn btn-outline view-plan-btn" data-workout="fullbody-beginner">
+                                <i class="fas fa-eye"></i> View Plan
+                            </button>
+                            <button class="btn btn-outline save-workout-btn">
+                                <i class="far fa-bookmark"></i> Save
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- HIIT Cardio -->
+                <div class="workout-card" data-level="intermediate" data-type="cardio">
+                    <div class="workout-image">
+                        <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="HIIT Cardio">
+                        <span class="workout-level intermediate">Intermediate</span>
+                    </div>
+                    <div class="workout-content">
+                        <h3>HIIT Cardio Blast</h3>
+                        <p>High-intensity interval training to boost metabolism and burn calories.</p>
+                        <div class="workout-details">
+                            <span><i class="fas fa-clock"></i> 25 mins</span>
+                            <span><i class="fas fa-fire"></i> High Intensity</span>
+                            <span><i class="fas fa-bolt"></i> 320 cal</span>
+                        </div>
+                        <div class="workout-rating">
+                            <div class="stars">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <span>5.0 (89 reviews)</span>
+                        </div>
+                        <div class="workout-actions">
+                            <a href="workout-detail.html?workout=hiit-cardio" class="btn btn-primary">
+                                <i class="fas fa-play-circle"></i> Start Workout
+                            </a>
+                            <button class="btn btn-outline view-plan-btn" data-workout="hiit-cardio">
+                                <i class="fas fa-eye"></i> View Plan
+                            </button>
+                            <button class="btn btn-outline save-workout-btn">
+                                <i class="far fa-bookmark"></i> Save
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Add more workout cards here... -->
+
+            </div>
+
+            <!-- Quick Actions Panel -->
+            <div class="quick-actions-panel">
+                <button class="quick-action-btn" id="quickActionBtn">
+                    <i class="fas fa-bolt"></i>
+                </button>
+                <div class="quick-actions-menu" id="quickActionsMenu">
+                    <a href="workout-detail.html" class="quick-action-item">
+                        <i class="fas fa-dumbbell"></i>
+                        <span>Quick Workout</span>
+                    </a>
+                    <a href="chat.html" class="quick-action-item">
+                        <i class="fas fa-robot"></i>
+                        <span>Ask HealthAI</span>
+                    </a>
+                    <a href="nutrition.html" class="quick-action-item">
+                        <i class="fas fa-apple-alt"></i>
+                        <span>Log Meal</span>
+                    </a>
+                    <a href="progress.html" class="quick-action-item">
+                        <i class="fas fa-chart-line"></i>
+                        <span>View Progress</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="logo">
+                        <i class="fas fa-brain"></i>
+                        <span>HealthAI</span>
+                    </div>
+                    <p>Your personal AI health and fitness assistant for a healthier lifestyle.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="chat.html">AI Assistant</a></li>
+                        <li><a href="workouts.html">Workouts</a></li>
+                        <li><a href="nutrition.html">Nutrition</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Contact Us</h4>
+                    <ul>
+                        <li><i class="fas fa-envelope"></i> support@healthai.com</li>
+                        <li><i class="fas fa-phone"></i> +1 (555) 123-4567</li>
+                        <li><i class="fas fa-map-marker-alt"></i> 123 Fitness St, Health City</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2023 HealthAI. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+    
+
+    <script src="js/auth.js"></script>
+    <script src="js/workouts.js"></script>
+    <script>
+// Initialize workout instructions
+document.addEventListener('DOMContentLoaded', function() {
+    // Start workout buttons with instructions
+    document.querySelectorAll('.start-workout-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const workoutId = this.getAttribute('data-workout');
+            workoutInstructions.showWorkoutInstructions(workoutId);
+        });
+    });
+
+    // Update workout detail page start button
+    const startWorkoutBtn = document.querySelector('.start-workout-btn');
+    if (startWorkoutBtn && !startWorkoutBtn.getAttribute('data-workout')) {
+        startWorkoutBtn.setAttribute('data-workout', 'fullbody-beginner');
+    }
+});
+</script>
+</body>
+</html>

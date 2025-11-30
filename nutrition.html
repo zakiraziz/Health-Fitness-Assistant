@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nutrition - HealthAI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/responsive.css">
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <nav class="navbar">
+                <div class="logo">
+                    <i class="fas fa-brain"></i>
+                    <span>HealthAI</span>
+                </div>
+                <div class="nav-links">
+                    <a href="index.html">Home</a>
+                    <a href="chat.html">AI Assistant</a>
+                    <a href="workouts.html">Workouts</a>
+                    <a href="nutrition.html" class="active">Nutrition</a>
+                    <a href="profile.html">Profile</a>
+                </div>
+                <div class="auth-buttons" id="authButtons">
+                    <button class="btn btn-outline" id="loginBtn">Login</button>
+                    <button class="btn btn-primary" id="signupBtn">Sign Up</button>
+                </div>
+                <div class="user-menu" id="userMenu">
+                    <div class="user-avatar" id="userAvatar">JD</div>
+                    <div class="user-dropdown" id="userDropdown">
+                        <a href="profile.html"><i class="fas fa-user"></i> My Profile</a>
+                        <a href="#"><i class="fas fa-cog"></i> Settings</a>
+                        <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Auth Modal -->
+    <div class="auth-modal" id="authModal">
+        <div class="auth-container">
+            <div class="auth-header">
+                <h2 id="authModalTitle">Welcome to HealthAI</h2>
+                <p id="authModalSubtitle">Your personal health assistant</p>
+            </div>
+            <div class="auth-tabs">
+                <div class="auth-tab active" id="loginTab">Login</div>
+                <div class="auth-tab" id="signupTab">Sign Up</div>
+            </div>
+            <div class="auth-content">
+                <form class="auth-form active" id="loginForm">
+                    <div class="form-group">
+                        <label for="loginEmail">Email</label>
+                        <input type="email" id="loginEmail" placeholder="Enter your email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Password</label>
+                        <input type="password" id="loginPassword" placeholder="Enter your password" required>
+                    </div>
+                    <div class="auth-options">
+                        <div class="remember-me">
+                            <input type="checkbox" id="rememberMe">
+                            <label for="rememberMe">Remember me</label>
+                        </div>
+                        <a href="#" class="forgot-password">Forgot password?</a>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Login</button>
+                    
+                    <div class="social-auth">
+                        <p>Or continue with</p>
+                        <div class="social-buttons">
+                            <div class="social-btn btn-google">
+                                <i class="fab fa-google"></i>
+                            </div>
+                            <div class="social-btn btn-facebook">
+                                <i class="fab fa-facebook-f"></i>
+                            </div>
+                            <div class="social-btn btn-apple">
+                                <i class="fab fa-apple"></i>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                
+                <form class="auth-form" id="signupForm">
+                    <div class="form-group">
+                        <label for="signupName">Full Name</label>
+                        <input type="text" id="signupName" placeholder="Enter your full name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="signupEmail">Email</label>
+                        <input type="email" id="signupEmail" placeholder="Enter your email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="signupPassword">Password</label>
+                        <input type="password" id="signupPassword" placeholder="Create a password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="signupConfirmPassword">Confirm Password</label>
+                        <input type="password" id="signupConfirmPassword" placeholder="Confirm your password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Create Account</button>
+                    
+                    <div class="social-auth">
+                        <p>Or continue with</p>
+                        <div class="social-buttons">
+                            <div class="social-btn btn-google">
+                                <i class="fab fa-google"></i>
+                            </div>
+                            <div class="social-btn btn-facebook">
+                                <i class="fab fa-facebook-f"></i>
+                            </div>
+                            <div class="social-btn btn-apple">
+                                <i class="fab fa-apple"></i>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Nutrition Section -->
+    <section class="nutrition-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Smart Nutrition Plans</h2>
+                <p>Discover meal plans and nutrition advice tailored to your goals and dietary preferences</p>
+            </div>
+
+            <div class="nutrition-cards">
+                <div class="nutrition-card">
+                    <div class="nutrition-icon">
+                        <i class="fas fa-weight"></i>
+                    </div>
+                    <h3>Weight Loss</h3>
+                    <p>Calorie-controlled meal plans designed to help you lose weight sustainably.</p>
+                    <ul>
+                        <li>Portion control guidance</li>
+                        <li>Low-calorie, high-nutrient foods</li>
+                        <li>Meal timing strategies</li>
+                    </ul>
+                    <button class="btn btn-primary">View Plan</button>
+                </div>
+
+                <div class="nutrition-card">
+                    <div class="nutrition-icon">
+                        <i class="fas fa-dumbbell"></i>
+                    </div>
+                    <h3>Muscle Building</h3>
+                    <p>High-protein diets to support muscle growth and recovery.</p>
+                    <ul>
+                        <li>Protein-rich meal ideas</li>
+                        <li>Post-workout nutrition</li>
+                        <li>Supplement guidance</li>
+                    </ul>
+                    <button class="btn btn-primary">View Plan</button>
+                </div>
+
+                <div class="nutrition-card">
+                    <div class="nutrition-icon">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <h3>Heart Health</h3>
+                    <p>Diets focused on improving cardiovascular health and reducing cholesterol.</p>
+                    <ul>
+                        <li>Low-sodium options</li>
+                        <li>Heart-healthy fats</li>
+                        <li>Fiber-rich foods</li>
+                    </ul>
+                    <button class="btn btn-primary">View Plan</button>
+                </div>
+            </div>
+
+            <div class="meal-plan">
+                <h3>Sample Daily Meal Plan</h3>
+                <div class="meal-timeline">
+                    <div class="meal-time">
+                        <div class="time">Breakfast<br>7:00 AM</div>
+                        <div class="meal">
+                            <h4>Oatmeal with Berries</h4>
+                            <p>1 cup oatmeal, 1/2 cup mixed berries, 1 tbsp almond butter</p>
+                            <span class="calories">320 calories</span>
+                        </div>
+                    </div>
+                    <div class="meal-time">
+                        <div class="time">Snack<br>10:30 AM</div>
+                        <div class="meal">
+                            <h4>Greek Yogurt with Nuts</h4>
+                            <p>1 cup Greek yogurt, 1/4 cup almonds</p>
+                            <span class="calories">280 calories</span>
+                        </div>
+                    </div>
+                    <div class="meal-time">
+                        <div class="time">Lunch<br>1:00 PM</div>
+                        <div class="meal">
+                            <h4>Grilled Chicken Salad</h4>
+                            <p>4 oz grilled chicken, mixed greens, vegetables, light vinaigrette</p>
+                            <span class="calories">420 calories</span>
+                        </div>
+                    </div>
+                    <div class="meal-time">
+                        <div class="time">Snack<br>4:00 PM</div>
+                        <div class="meal">
+                            <h4>Apple with Peanut Butter</h4>
+                            <p>1 medium apple, 2 tbsp peanut butter</p>
+                            <span class="calories">250 calories</span>
+                        </div>
+                    </div>
+                    <div class="meal-time">
+                        <div class="time">Dinner<br>7:00 PM</div>
+                        <div class="meal">
+                            <h4>Salmon with Quinoa</h4>
+                            <p>5 oz baked salmon, 1 cup quinoa, steamed broccoli</p>
+                            <span class="calories">480 calories</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="nutrition-tips">
+                <h3>Nutrition Tips from HealthAI</h3>
+                <div class="tips-grid">
+                    <div class="tip-card">
+                        <h4>Stay Hydrated</h4>
+                        <p>Drink at least 8 glasses of water daily. Proper hydration supports metabolism and helps control appetite.</p>
+                    </div>
+                    <div class="tip-card">
+                        <h4>Eat More Fiber</h4>
+                        <p>Include high-fiber foods like vegetables, fruits, and whole grains to improve digestion and feel fuller longer.</p>
+                    </div>
+                    <div class="tip-card">
+                        <h4>Balance Macronutrients</h4>
+                        <p>Ensure each meal contains a balance of protein, carbohydrates, and healthy fats for sustained energy.</p>
+                    </div>
+                    <div class="tip-card">
+                        <h4>Plan Your Meals</h4>
+                        <p>Meal planning helps you make healthier choices and avoid impulsive eating decisions.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="logo">
+                        <i class="fas fa-brain"></i>
+                        <span>HealthAI</span>
+                    </div>
+                    <p>Your personal AI health and fitness assistant for a healthier lifestyle.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="chat.html">AI Assistant</a></li>
+                        <li><a href="workouts.html">Workouts</a></li>
+                        <li><a href="nutrition.html">Nutrition</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Contact Us</h4>
+                    <ul>
+                        <li><i class="fas fa-envelope"></i> support@healthai.com</li>
+                        <li><i class="fas fa-phone"></i> +1 (555) 123-4567</li>
+                        <li><i class="fas fa-map-marker-alt"></i> 123 Fitness St, Health City</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2023 HealthAI. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/auth.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
