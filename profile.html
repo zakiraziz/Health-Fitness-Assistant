@@ -124,35 +124,97 @@
         </div>
     </div>
 
+    <!-- Profile Edit Modal -->
+    <div class="modal" id="editProfileModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Edit Profile</h3>
+                <button class="close-modal" id="closeEditModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="editProfileForm">
+                    <div class="form-group">
+                        <label for="editName">Full Name</label>
+                        <input type="text" id="editName" placeholder="Enter your full name" value="John Doe">
+                    </div>
+                    <div class="form-group">
+                        <label for="editEmail">Email</label>
+                        <input type="email" id="editEmail" placeholder="Enter your email" value="john@example.com">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="editWeight">Weight (lbs)</label>
+                            <input type="number" id="editWeight" value="165">
+                        </div>
+                        <div class="form-group">
+                            <label for="editHeight">Height (inches)</label>
+                            <input type="number" id="editHeight" value="70">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="editGoal">Fitness Goal</label>
+                        <select id="editGoal">
+                            <option value="weight_loss">Weight Loss</option>
+                            <option value="muscle_gain" selected>Muscle Gain</option>
+                            <option value="endurance">Endurance</option>
+                            <option value="maintenance">Maintenance</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editBio">Bio</label>
+                        <textarea id="editBio" rows="3" placeholder="Tell us about yourself">Fitness enthusiast focused on strength training and healthy eating. Working towards running my first marathon next year.</textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="cancelEdit">Cancel</button>
+                <button class="btn btn-primary" id="saveProfile">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Profile Section -->
     <section class="profile-section">
         <div class="container">
             <div class="profile-header">
                 <div class="profile-info">
                     <div class="profile-avatar">
-                        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="User Avatar">
-                        <button class="edit-avatar"><i class="fas fa-camera"></i></button>
+                        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="User Avatar" id="userAvatarImg">
+                        <button class="edit-avatar" id="changeAvatarBtn"><i class="fas fa-camera"></i></button>
                     </div>
                     <div class="profile-details">
                         <h2 id="userName">John Doe</h2>
-                        <p>Member since January 2023</p>
+                        <p id="userBio">Fitness enthusiast focused on strength training and healthy eating</p>
                         <div class="profile-stats">
                             <div class="stat">
-                                <span class="stat-value">24</span>
+                                <span class="stat-value" id="workoutCount">24</span>
                                 <span class="stat-label">Workouts</span>
                             </div>
                             <div class="stat">
-                                <span class="stat-value">15</span>
+                                <span class="stat-value" id="mealCount">15</span>
                                 <span class="stat-label">Meals Logged</span>
                             </div>
                             <div class="stat">
-                                <span class="stat-value">8</span>
+                                <span class="stat-value" id="weekCount">8</span>
                                 <span class="stat-label">Weeks Active</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-value" id="streakCount">7</span>
+                                <span class="stat-label">Day Streak</span>
                             </div>
                         </div>
                     </div>
                 </div>
-                <button class="btn btn-primary">Edit Profile</button>
+                <button class="btn btn-primary" id="editProfileBtn">Edit Profile</button>
+            </div>
+
+            <!-- Profile Tabs -->
+            <div class="profile-tabs">
+                <button class="profile-tab active" data-tab="overview">Overview</button>
+                <button class="profile-tab" data-tab="workouts">Workouts</button>
+                <button class="profile-tab" data-tab="nutrition">Nutrition</button>
+                <button class="profile-tab" data-tab="progress">Progress</button>
+                <button class="profile-tab" data-tab="achievements">Achievements</button>
             </div>
 
             <div class="profile-content">
@@ -162,32 +224,40 @@
                         <div class="metrics">
                             <div class="metric">
                                 <span class="metric-label">Weight</span>
-                                <span class="metric-value">165 lbs</span>
+                                <span class="metric-value" id="currentWeight">165 lbs</span>
+                                <button class="metric-edit" data-metric="weight"><i class="fas fa-edit"></i></button>
                             </div>
                             <div class="metric">
                                 <span class="metric-label">Height</span>
-                                <span class="metric-value">5'10"</span>
+                                <span class="metric-value" id="currentHeight">5'10"</span>
+                                <button class="metric-edit" data-metric="height"><i class="fas fa-edit"></i></button>
                             </div>
                             <div class="metric">
                                 <span class="metric-label">BMI</span>
-                                <span class="metric-value">23.7</span>
+                                <span class="metric-value" id="currentBMI">23.7</span>
                             </div>
                             <div class="metric">
                                 <span class="metric-label">Goal Weight</span>
-                                <span class="metric-value">160 lbs</span>
+                                <span class="metric-value" id="goalWeight">160 lbs</span>
+                                <button class="metric-edit" data-metric="goal"><i class="fas fa-edit"></i></button>
+                            </div>
+                            <div class="metric">
+                                <span class="metric-label">Daily Calories</span>
+                                <span class="metric-value" id="dailyCalories">2,200</span>
                             </div>
                         </div>
                     </div>
 
                     <div class="sidebar-section">
-                        <h3>Fitness Goals</h3>
-                        <ul class="goals-list">
+                        <h3>Fitness Goals <button class="add-goal" id="addGoalBtn"><i class="fas fa-plus"></i></button></h3>
+                        <ul class="goals-list" id="goalsList">
                             <li>
                                 <i class="fas fa-running"></i>
                                 <span>Run 5K without stopping</span>
                                 <div class="progress-bar">
                                     <div class="progress" style="width: 65%"></div>
                                 </div>
+                                <span class="goal-progress">65%</span>
                             </li>
                             <li>
                                 <i class="fas fa-dumbbell"></i>
@@ -195,6 +265,7 @@
                                 <div class="progress-bar">
                                     <div class="progress" style="width: 40%"></div>
                                 </div>
+                                <span class="goal-progress">40%</span>
                             </li>
                             <li>
                                 <i class="fas fa-apple-alt"></i>
@@ -202,68 +273,294 @@
                                 <div class="progress-bar">
                                     <div class="progress" style="width: 80%"></div>
                                 </div>
+                                <span class="goal-progress">80%</span>
                             </li>
                         </ul>
+                    </div>
+
+                    <div class="sidebar-section">
+                        <h3>Weekly Progress</h3>
+                        <div class="weekly-chart">
+                            <div class="chart-bar" style="height: 40%;" data-day="Mon">
+                                <span class="chart-value">40%</span>
+                            </div>
+                            <div class="chart-bar" style="height: 60%;" data-day="Tue">
+                                <span class="chart-value">60%</span>
+                            </div>
+                            <div class="chart-bar" style="height: 80%;" data-day="Wed">
+                                <span class="chart-value">80%</span>
+                            </div>
+                            <div class="chart-bar" style="height: 70%;" data-day="Thu">
+                                <span class="chart-value">70%</span>
+                            </div>
+                            <div class="chart-bar" style="height: 90%;" data-day="Fri">
+                                <span class="chart-value">90%</span>
+                            </div>
+                            <div class="chart-bar" style="height: 30%;" data-day="Sat">
+                                <span class="chart-value">30%</span>
+                            </div>
+                            <div class="chart-bar" style="height: 65%;" data-day="Sun">
+                                <span class="chart-value">65%</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
                 <div class="profile-main">
-                    <div class="activity-section">
-                        <h3>Recent Activity</h3>
-                        <div class="activity-timeline">
-                            <div class="activity-item">
-                                <div class="activity-icon">
-                                    <i class="fas fa-dumbbell"></i>
+                    <!-- Overview Tab Content -->
+                    <div class="tab-content active" id="overviewTab">
+                        <div class="activity-section">
+                            <h3>Recent Activity</h3>
+                            <div class="activity-timeline" id="activityTimeline">
+                                <div class="activity-item">
+                                    <div class="activity-icon">
+                                        <i class="fas fa-dumbbell"></i>
+                                    </div>
+                                    <div class="activity-content">
+                                        <h4>Completed Full Body Workout</h4>
+                                        <p>You finished a 35-minute strength training session</p>
+                                        <span class="activity-time">2 hours ago</span>
+                                    </div>
                                 </div>
-                                <div class="activity-content">
-                                    <h4>Completed Full Body Workout</h4>
-                                    <p>You finished a 35-minute strength training session</p>
-                                    <span class="activity-time">2 hours ago</span>
+                                <div class="activity-item">
+                                    <div class="activity-icon">
+                                        <i class="fas fa-utensils"></i>
+                                    </div>
+                                    <div class="activity-content">
+                                        <h4>Logged Breakfast</h4>
+                                        <p>Oatmeal with berries and almond butter - 320 calories</p>
+                                        <span class="activity-time">5 hours ago</span>
+                                    </div>
+                                </div>
+                                <div class="activity-item">
+                                    <div class="activity-icon">
+                                        <i class="fas fa-weight"></i>
+                                    </div>
+                                    <div class="activity-content">
+                                        <h4>Updated Weight</h4>
+                                        <p>You logged your current weight: 165 lbs</p>
+                                        <span class="activity-time">1 day ago</span>
+                                    </div>
+                                </div>
+                                <div class="activity-item">
+                                    <div class="activity-icon">
+                                        <i class="fas fa-running"></i>
+                                    </div>
+                                    <div class="activity-content">
+                                        <h4>Completed Cardio Session</h4>
+                                        <p>30 minutes of running at moderate intensity</p>
+                                        <span class="activity-time">2 days ago</span>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="activity-item">
-                                <div class="activity-icon">
-                                    <i class="fas fa-utensils"></i>
+                            <button class="btn btn-outline" id="loadMoreActivities">Load More Activities</button>
+                        </div>
+
+                        <div class="ai-recommendations">
+                            <h3>HealthAI Recommendations</h3>
+                            <div class="recommendation-card">
+                                <div class="recommendation-icon">
+                                    <i class="fas fa-robot"></i>
                                 </div>
-                                <div class="activity-content">
-                                    <h4>Logged Breakfast</h4>
-                                    <p>Oatmeal with berries and almond butter - 320 calories</p>
-                                    <span class="activity-time">5 hours ago</span>
-                                </div>
-                            </div>
-                            <div class="activity-item">
-                                <div class="activity-icon">
-                                    <i class="fas fa-weight"></i>
-                                </div>
-                                <div class="activity-content">
-                                    <h4>Updated Weight</h4>
-                                    <p>You logged your current weight: 165 lbs</p>
-                                    <span class="activity-time">1 day ago</span>
-                                </div>
-                            </div>
-                            <div class="activity-item">
-                                <div class="activity-icon">
-                                    <i class="fas fa-running"></i>
-                                </div>
-                                <div class="activity-content">
-                                    <h4>Completed Cardio Session</h4>
-                                    <p>30 minutes of running at moderate intensity</p>
-                                    <span class="activity-time">2 days ago</span>
+                                <div class="recommendation-content">
+                                    <h4>Based on your activity, I recommend:</h4>
+                                    <p>Try incorporating more protein in your post-workout meals to support muscle recovery. Consider adding a protein shake after your strength training sessions.</p>
+                                    <div class="recommendation-actions">
+                                        <button class="btn btn-outline">View Details</button>
+                                        <button class="btn btn-primary">Add to Plan</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="ai-recommendations">
-                        <h3>HealthAI Recommendations</h3>
-                        <div class="recommendation-card">
-                            <div class="recommendation-icon">
-                                <i class="fas fa-robot"></i>
+                    <!-- Workouts Tab Content -->
+                    <div class="tab-content" id="workoutsTab">
+                        <div class="workouts-header">
+                            <h3>My Workouts</h3>
+                            <button class="btn btn-primary" id="addWorkoutBtn"><i class="fas fa-plus"></i> Add Workout</button>
+                        </div>
+                        <div class="workouts-grid">
+                            <div class="workout-card">
+                                <div class="workout-header">
+                                    <h4>Strength Training</h4>
+                                    <span class="workout-time">45 mins</span>
+                                </div>
+                                <div class="workout-body">
+                                    <p><i class="fas fa-calendar"></i> Today, 10:00 AM</p>
+                                    <p><i class="fas fa-fire"></i> 320 calories burned</p>
+                                    <div class="workout-exercises">
+                                        <span class="exercise-tag">Bench Press</span>
+                                        <span class="exercise-tag">Squats</span>
+                                        <span class="exercise-tag">Deadlifts</span>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="recommendation-content">
-                                <h4>Based on your activity, I recommend:</h4>
-                                <p>Try incorporating more protein in your post-workout meals to support muscle recovery. Consider adding a protein shake after your strength training sessions.</p>
-                                <button class="btn btn-outline">View Details</button>
+                            <div class="workout-card">
+                                <div class="workout-header">
+                                    <h4>Morning Run</h4>
+                                    <span class="workout-time">30 mins</span>
+                                </div>
+                                <div class="workout-body">
+                                    <p><i class="fas fa-calendar"></i> Yesterday, 7:30 AM</p>
+                                    <p><i class="fas fa-fire"></i> 280 calories burned</p>
+                                    <p><i class="fas fa-road"></i> 3.2 miles</p>
+                                </div>
+                            </div>
+                            <div class="workout-card">
+                                <div class="workout-header">
+                                    <h4>Yoga Session</h4>
+                                    <span class="workout-time">60 mins</span>
+                                </div>
+                                <div class="workout-body">
+                                    <p><i class="fas fa-calendar"></i> 2 days ago</p>
+                                    <p><i class="fas fa-fire"></i> 180 calories burned</p>
+                                    <p><i class="fas fa-heart"></i> Focus: Flexibility</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Nutrition Tab Content -->
+                    <div class="tab-content" id="nutritionTab">
+                        <div class="nutrition-header">
+                            <h3>Daily Nutrition</h3>
+                            <div class="date-selector">
+                                <button class="date-nav"><i class="fas fa-chevron-left"></i></button>
+                                <span class="current-date">Today</span>
+                                <button class="date-nav"><i class="fas fa-chevron-right"></i></button>
+                            </div>
+                        </div>
+                        <div class="nutrition-summary">
+                            <div class="nutrition-metric">
+                                <span class="nutrition-value">1,850</span>
+                                <span class="nutrition-label">Calories</span>
+                                <div class="nutrition-progress" style="width: 85%"></div>
+                            </div>
+                            <div class="nutrition-metric">
+                                <span class="nutrition-value">125g</span>
+                                <span class="nutrition-label">Protein</span>
+                                <div class="nutrition-progress" style="width: 90%"></div>
+                            </div>
+                            <div class="nutrition-metric">
+                                <span class="nutrition-value">185g</span>
+                                <span class="nutrition-label">Carbs</span>
+                                <div class="nutrition-progress" style="width: 75%"></div>
+                            </div>
+                            <div class="nutrition-metric">
+                                <span class="nutrition-value">65g</span>
+                                <span class="nutrition-label">Fat</span>
+                                <div class="nutrition-progress" style="width: 70%"></div>
+                            </div>
+                        </div>
+                        <div class="meals-list">
+                            <div class="meal-card">
+                                <h4><i class="fas fa-sun"></i> Breakfast</h4>
+                                <div class="meal-items">
+                                    <div class="meal-item">
+                                        <span>Oatmeal with berries</span>
+                                        <span>320 cal</span>
+                                    </div>
+                                    <div class="meal-item">
+                                        <span>Protein shake</span>
+                                        <span>180 cal</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="meal-card">
+                                <h4><i class="fas fa-cloud-sun"></i> Lunch</h4>
+                                <div class="meal-items">
+                                    <div class="meal-item">
+                                        <span>Grilled chicken salad</span>
+                                        <span>420 cal</span>
+                                    </div>
+                                    <div class="meal-item">
+                                        <span>Quinoa</span>
+                                        <span>200 cal</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Progress Tab Content -->
+                    <div class="tab-content" id="progressTab">
+                        <h3>Progress Charts</h3>
+                        <div class="charts-container">
+                            <div class="chart-card">
+                                <h4>Weight Progress</h4>
+                                <div class="chart-placeholder">
+                                    <!-- In a real app, this would be a chart -->
+                                    <p>Line chart showing weight changes over time</p>
+                                </div>
+                            </div>
+                            <div class="chart-card">
+                                <h4>Workout Frequency</h4>
+                                <div class="chart-placeholder">
+                                    <p>Bar chart showing workouts per week</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="progress-stats">
+                            <div class="progress-stat">
+                                <h4>Total Weight Loss</h4>
+                                <p class="stat-number">-8 lbs</p>
+                                <p class="stat-period">Last 3 months</p>
+                            </div>
+                            <div class="progress-stat">
+                                <h4>Workouts Completed</h4>
+                                <p class="stat-number">24</p>
+                                <p class="stat-period">This month</p>
+                            </div>
+                            <div class="progress-stat">
+                                <h4>Average Daily Steps</h4>
+                                <p class="stat-number">8,542</p>
+                                <p class="stat-period">Last 30 days</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Achievements Tab Content -->
+                    <div class="tab-content" id="achievementsTab">
+                        <h3>Your Achievements</h3>
+                        <div class="achievements-grid">
+                            <div class="achievement-card unlocked">
+                                <div class="achievement-icon">
+                                    <i class="fas fa-dumbbell"></i>
+                                </div>
+                                <div class="achievement-info">
+                                    <h4>Strength Starter</h4>
+                                    <p>Complete 10 strength workouts</p>
+                                </div>
+                            </div>
+                            <div class="achievement-card unlocked">
+                                <div class="achievement-icon">
+                                    <i class="fas fa-running"></i>
+                                </div>
+                                <div class="achievement-info">
+                                    <h4>Marathon Runner</h4>
+                                    <p>Run 26.2 miles total</p>
+                                </div>
+                            </div>
+                            <div class="achievement-card locked">
+                                <div class="achievement-icon">
+                                    <i class="fas fa-apple-alt"></i>
+                                </div>
+                                <div class="achievement-info">
+                                    <h4>Healthy Eater</h4>
+                                    <p>Log 30 healthy meals</p>
+                                    <p class="achievement-progress">15/30</p>
+                                </div>
+                            </div>
+                            <div class="achievement-card locked">
+                                <div class="achievement-icon">
+                                    <i class="fas fa-calendar-check"></i>
+                                </div>
+                                <div class="achievement-info">
+                                    <h4>Consistency King</h4>
+                                    <p>7-day workout streak</p>
+                                    <p class="achievement-progress">5/7</p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -271,6 +568,36 @@
             </div>
         </div>
     </section>
+
+    <!-- Quick Add Modal -->
+    <div class="quick-add-modal" id="quickAddModal">
+        <div class="quick-add-content">
+            <h3>Quick Add</h3>
+            <div class="quick-add-options">
+                <button class="quick-add-option" data-type="workout">
+                    <i class="fas fa-dumbbell"></i>
+                    <span>Workout</span>
+                </button>
+                <button class="quick-add-option" data-type="meal">
+                    <i class="fas fa-utensils"></i>
+                    <span>Meal</span>
+                </button>
+                <button class="quick-add-option" data-type="weight">
+                    <i class="fas fa-weight"></i>
+                    <span>Weight</span>
+                </button>
+                <button class="quick-add-option" data-type="water">
+                    <i class="fas fa-tint"></i>
+                    <span>Water</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Add Button -->
+    <div class="quick-add-btn" id="quickAddBtn">
+        <i class="fas fa-plus"></i>
+    </div>
 
     <!-- Footer -->
     <footer>
@@ -309,5 +636,179 @@
 
     <script src="js/auth.js"></script>
     <script src="js/main.js"></script>
+    <script>
+        // Profile-specific JavaScript
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tab switching functionality
+            const tabs = document.querySelectorAll('.profile-tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const targetTab = tab.getAttribute('data-tab');
+                    
+                    // Update active tab
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    
+                    // Show target tab content
+                    tabContents.forEach(content => {
+                        content.classList.remove('active');
+                        if (content.id === targetTab + 'Tab') {
+                            content.classList.add('active');
+                        }
+                    });
+                });
+            });
+            
+            // Edit Profile Modal
+            const editProfileBtn = document.getElementById('editProfileBtn');
+            const editProfileModal = document.getElementById('editProfileModal');
+            const closeEditModal = document.getElementById('closeEditModal');
+            const cancelEdit = document.getElementById('cancelEdit');
+            const saveProfile = document.getElementById('saveProfile');
+            
+            editProfileBtn.addEventListener('click', () => {
+                editProfileModal.style.display = 'block';
+            });
+            
+            closeEditModal.addEventListener('click', () => {
+                editProfileModal.style.display = 'none';
+            });
+            
+            cancelEdit.addEventListener('click', () => {
+                editProfileModal.style.display = 'none';
+            });
+            
+            saveProfile.addEventListener('click', () => {
+                const name = document.getElementById('editName').value;
+                const bio = document.getElementById('editBio').value;
+                
+                // Update profile info
+                document.getElementById('userName').textContent = name;
+                document.getElementById('userBio').textContent = bio;
+                
+                // Show success message
+                alert('Profile updated successfully!');
+                editProfileModal.style.display = 'none';
+            });
+            
+            // Quick Add Button
+            const quickAddBtn = document.getElementById('quickAddBtn');
+            const quickAddModal = document.getElementById('quickAddModal');
+            
+            quickAddBtn.addEventListener('click', () => {
+                quickAddModal.style.display = 'block';
+            });
+            
+            // Close quick add modal when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!quickAddModal.contains(e.target) && e.target !== quickAddBtn) {
+                    quickAddModal.style.display = 'none';
+                }
+            });
+            
+            // Quick Add Options
+            const quickAddOptions = document.querySelectorAll('.quick-add-option');
+            quickAddOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    const type = option.getAttribute('data-type');
+                    alert(`Adding new ${type}...`);
+                    quickAddModal.style.display = 'none';
+                });
+            });
+            
+            // Add Goal Button
+            const addGoalBtn = document.getElementById('addGoalBtn');
+            addGoalBtn.addEventListener('click', () => {
+                const goalText = prompt('Enter your new goal:');
+                if (goalText) {
+                    const goalsList = document.getElementById('goalsList');
+                    const newGoal = document.createElement('li');
+                    newGoal.innerHTML = `
+                        <i class="fas fa-bullseye"></i>
+                        <span>${goalText}</span>
+                        <div class="progress-bar">
+                            <div class="progress" style="width: 0%"></div>
+                        </div>
+                        <span class="goal-progress">0%</span>
+                    `;
+                    goalsList.appendChild(newGoal);
+                }
+            });
+            
+            // Metric Edit Buttons
+            const metricEdits = document.querySelectorAll('.metric-edit');
+            metricEdits.forEach(button => {
+                button.addEventListener('click', () => {
+                    const metric = button.getAttribute('data-metric');
+                    let currentValue, promptText;
+                    
+                    switch(metric) {
+                        case 'weight':
+                            currentValue = document.getElementById('currentWeight').textContent;
+                            promptText = 'Enter new weight (lbs):';
+                            break;
+                        case 'height':
+                            currentValue = document.getElementById('currentHeight').textContent;
+                            promptText = 'Enter new height (feet inches):';
+                            break;
+                        case 'goal':
+                            currentValue = document.getElementById('goalWeight').textContent;
+                            promptText = 'Enter new goal weight (lbs):';
+                            break;
+                    }
+                    
+                    const newValue = prompt(promptText, currentValue);
+                    if (newValue) {
+                        switch(metric) {
+                            case 'weight':
+                                document.getElementById('currentWeight').textContent = newValue + ' lbs';
+                                break;
+                            case 'height':
+                                document.getElementById('currentHeight').textContent = newValue;
+                                break;
+                            case 'goal':
+                                document.getElementById('goalWeight').textContent = newValue + ' lbs';
+                                break;
+                        }
+                    }
+                });
+            });
+            
+            // Load More Activities
+            const loadMoreBtn = document.getElementById('loadMoreActivities');
+            loadMoreBtn.addEventListener('click', () => {
+                const activityTimeline = document.getElementById('activityTimeline');
+                const newActivity = document.createElement('div');
+                newActivity.className = 'activity-item';
+                newActivity.innerHTML = `
+                    <div class="activity-icon">
+                        <i class="fas fa-bed"></i>
+                    </div>
+                    <div class="activity-content">
+                        <h4>Sleep Logged</h4>
+                        <p>You slept for 7.5 hours last night</p>
+                        <span class="activity-time">Just now</span>
+                    </div>
+                `;
+                activityTimeline.appendChild(newActivity);
+                loadMoreBtn.textContent = 'Loading...';
+                setTimeout(() => {
+                    loadMoreBtn.textContent = 'Load More Activities';
+                }, 1000);
+            });
+            
+            // Initialize weekly chart tooltips
+            const chartBars = document.querySelectorAll('.chart-bar');
+            chartBars.forEach(bar => {
+                bar.addEventListener('mouseover', () => {
+                    const day = bar.getAttribute('data-day');
+                    const value = bar.querySelector('.chart-value').textContent;
+                    bar.setAttribute('title', `${day}: ${value} goal completion`);
+                });
+            });
+        });
+    </script>
 </body>
 </html>

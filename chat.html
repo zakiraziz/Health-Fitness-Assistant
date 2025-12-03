@@ -126,6 +126,422 @@
             </div>
         </div>
     </section>
+    <!-- New Chat Features HTML -->
+<div class="chat-controls">
+    <div class="control-buttons">
+        <button class="btn btn-outline" id="clearChatBtn" title="Clear conversation">
+            <i class="fas fa-trash-alt"></i> Clear Chat
+        </button>
+        <button class="btn btn-outline" id="saveChatBtn" title="Save conversation">
+            <i class="fas fa-save"></i> Save Chat
+        </button>
+        <button class="btn btn-outline" id="exportChatBtn" title="Export as PDF">
+            <i class="fas fa-file-pdf"></i> Export PDF
+        </button>
+        <button class="btn btn-outline" id="historyBtn" title="Chat history">
+            <i class="fas fa-history"></i> History
+        </button>
+    </div>
+    <div class="chat-stats">
+        <div class="stat-item">
+            <i class="fas fa-comment-alt"></i>
+            <span id="messageCount">0 messages</span>
+        </div>
+        <div class="stat-item">
+            <i class="fas fa-clock"></i>
+            <span id="chatDuration">0 min</span>
+        </div>
+        <div class="stat-item">
+            <i class="fas fa-brain"></i>
+            <span id="aiResponseTime">0s avg</span>
+        </div>
+    </div>
+</div>
+
+<!-- Chat History Panel -->
+<div class="chat-history-panel" id="historyPanel">
+    <div class="history-header">
+        <h3>Chat History</h3>
+        <button class="close-history" id="closeHistoryBtn" aria-label="Close history">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    <div class="history-list" id="historyList">
+        <!-- History items will be added dynamically -->
+        <div class="history-item">
+            <div class="history-date">Today, 10:30 AM</div>
+            <div class="history-preview">What's a good workout routine for weight loss?</div>
+        </div>
+    </div>
+</div>
+<div class="overlay" id="historyOverlay"></div>
+
+<!-- Quick Actions Menu -->
+<div class="quick-actions">
+    <button class="quick-action-btn" id="voiceInputBtn" title="Voice input">
+        <i class="fas fa-microphone"></i>
+    </button>
+    <button class="quick-action-btn" id="attachBtn" title="Attach file">
+        <i class="fas fa-paperclip"></i>
+    </button>
+    <button class="quick-action-btn" id="emergencyBtn" title="Emergency contact">
+        <i class="fas fa-first-aid"></i>
+    </button>
+</div>
+
+<!-- Enhanced Input Area -->
+<div class="chat-input-advanced">
+    <div class="input-options">
+        <div class="option-group">
+            <label for="toneSelect">Response Tone:</label>
+            <select id="toneSelect">
+                <option value="professional">Professional</option>
+                <option value="friendly" selected>Friendly</option>
+                <option value="motivational">Motivational</option>
+                <option value="technical">Technical</option>
+            </select>
+        </div>
+        <div class="option-group">
+            <label for="detailLevel">Detail Level:</label>
+            <select id="detailLevel">
+                <option value="brief">Brief</option>
+                <option value="moderate" selected>Moderate</option>
+                <option value="detailed">Detailed</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<!-- Message Templates -->
+<div class="message-templates">
+    <div class="templates-header">
+        <h4>Common Questions</h4>
+        <button class="toggle-templates" id="toggleTemplatesBtn">
+            <i class="fas fa-chevron-down"></i>
+        </button>
+    </div>
+    <div class="templates-grid" id="templatesGrid">
+        <div class="template-card" data-template="workout_plan">
+            <i class="fas fa-dumbbell"></i>
+            <span>Get workout plan</span>
+        </div>
+        <div class="template-card" data-template="meal_plan">
+            <i class="fas fa-apple-alt"></i>
+            <span>Get meal plan</span>
+        </div>
+        <div class="template-card" data-template="symptom_check">
+            <i class="fas fa-heartbeat"></i>
+            <span>Symptom check</span>
+        </div>
+        <div class="template-card" data-template="hydration">
+            <i class="fas fa-tint"></i>
+            <span>Hydration advice</span>
+        </div>
+        <div class="template-card" data-template="sleep">
+            <i class="fas fa-bed"></i>
+            <span>Sleep tips</span>
+        </div>
+        <div class="template-card" data-template="stress">
+            <i class="fas fa-brain"></i>
+            <span>Stress management</span>
+        </div>
+    </div>
+</div>
+
+<!-- Voice Input Modal -->
+<div class="voice-modal" id="voiceModal">
+    <div class="voice-container">
+        <div class="voice-header">
+            <h3>Voice Input</h3>
+            <button class="close-voice" id="closeVoiceBtn">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="voice-content">
+            <div class="voice-visualizer" id="voiceVisualizer">
+                <!-- Voice waves will appear here -->
+            </div>
+            <div class="voice-status" id="voiceStatus">
+                Click microphone to start speaking
+            </div>
+            <button class="voice-control" id="voiceControlBtn">
+                <i class="fas fa-microphone"></i>
+            </button>
+            <div class="voice-transcript" id="voiceTranscript">
+                Your speech will appear here...
+            </div>
+        </div>
+        <div class="voice-actions">
+            <button class="btn btn-outline" id="cancelVoiceBtn">Cancel</button>
+            <button class="btn btn-primary" id="sendVoiceBtn" disabled>Send</button>
+        </div>
+    </div>
+</div>
+
+<!-- Emergency Contact Modal -->
+<div class="emergency-modal" id="emergencyModal">
+    <div class="emergency-container">
+        <div class="emergency-header">
+            <h3><i class="fas fa-first-aid"></i> Emergency Assistance</h3>
+            <button class="close-emergency" id="closeEmergencyBtn">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="emergency-content">
+            <div class="emergency-warning">
+                <i class="fas fa-exclamation-triangle"></i>
+                <p><strong>Important:</strong> This is not a substitute for professional medical advice. In case of emergency, call your local emergency number immediately.</p>
+            </div>
+            
+            <div class="emergency-contacts">
+                <h4>Emergency Contacts</h4>
+                <div class="contact-list">
+                    <div class="contact-item">
+                        <i class="fas fa-phone-alt"></i>
+                        <div class="contact-info">
+                            <strong>Local Emergency</strong>
+                            <span>112 / 911 / 999</span>
+                        </div>
+                        <button class="btn-call">
+                            <i class="fas fa-phone"></i> Call
+                        </button>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-hospital"></i>
+                        <div class="contact-info">
+                            <strong>Nearest Hospital</strong>
+                            <span>General Hospital - 5km away</span>
+                        </div>
+                        <button class="btn-directions">
+                            <i class="fas fa-directions"></i> Directions
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="symptom-checker">
+                <h4>Quick Symptom Checker</h4>
+                <div class="symptom-options">
+                    <button class="symptom-btn" data-symptom="chest_pain">
+                        <i class="fas fa-heart"></i> Chest Pain
+                    </button>
+                    <button class="symptom-btn" data-symptom="difficulty_breathing">
+                        <i class="fas fa-lungs"></i> Breathing Difficulty
+                    </button>
+                    <button class="symptom-btn" data-symptom="severe_pain">
+                        <i class="fas fa-bolt"></i> Severe Pain
+                    </button>
+                    <button class="symptom-btn" data-symptom="bleeding">
+                        <i class="fas fa-tint"></i> Uncontrolled Bleeding
+                    </button>
+                </div>
+            </div>
+            
+            <div class="emergency-instructions">
+                <h4>Emergency Instructions</h4>
+                <ol>
+                    <li>Stay calm and assess the situation</li>
+                    <li>Call emergency services immediately</li>
+                    <li>Provide clear location information</li>
+                    <li>Follow operator instructions</li>
+                    <li>Do not move the injured person unless necessary</li>
+                </ol>
+            </div>
+        </div>
+        <div class="emergency-footer">
+            <button class="btn btn-primary" id="shareLocationBtn">
+                <i class="fas fa-location-arrow"></i> Share My Location
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- AI Response Actions (Added to each message) -->
+<div class="message-actions" style="display: none;">
+    <button class="action-btn copy-btn" title="Copy message">
+        <i class="far fa-copy"></i>
+    </button>
+    <button class="action-btn save-btn" title="Save message">
+        <i class="far fa-bookmark"></i>
+    </button>
+    <button class="action-btn feedback-btn" title="Provide feedback">
+        <i class="far fa-thumbs-up"></i>
+    </button>
+    <button class="action-btn translate-btn" title="Translate">
+        <i class="fas fa-language"></i>
+    </button>
+</div>
+
+<!-- Chat Export Options -->
+<div class="export-modal" id="exportModal">
+    <div class="export-container">
+        <div class="export-header">
+            <h3>Export Conversation</h3>
+            <button class="close-export" id="closeExportBtn">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="export-options">
+            <div class="export-option" data-format="pdf">
+                <i class="fas fa-file-pdf"></i>
+                <h4>PDF Document</h4>
+                <p>Export as printable PDF with formatting</p>
+            </div>
+            <div class="export-option" data-format="text">
+                <i class="fas fa-file-alt"></i>
+                <h4>Text File</h4>
+                <p>Plain text format for easy sharing</p>
+            </div>
+            <div class="export-option" data-format="json">
+                <i class="fas fa-code"></i>
+                <h4>JSON Data</h4>
+                <p>Structured data for analysis</p>
+            </div>
+        </div>
+        <div class="export-settings">
+            <div class="setting">
+                <input type="checkbox" id="includeTimestamps" checked>
+                <label for="includeTimestamps">Include timestamps</label>
+            </div>
+            <div class="setting">
+                <input type="checkbox" id="includeAvatars" checked>
+                <label for="includeAvatars">Include avatars</label>
+            </div>
+            <div class="setting">
+                <input type="checkbox" id="encryptFile">
+                <label for="encryptFile">Encrypt file</label>
+            </div>
+        </div>
+        <div class="export-actions">
+            <button class="btn btn-outline" id="cancelExportBtn">Cancel</button>
+            <button class="btn btn-primary" id="confirmExportBtn">Export</button>
+        </div>
+    </div>
+</div>
+
+<!-- Health Data Integration -->
+<div class="health-data-panel" id="healthDataPanel">
+    <div class="health-data-header">
+        <h3>Health Data Integration</h3>
+        <button class="close-health-data" id="closeHealthDataBtn">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    <div class="health-data-content">
+        <div class="data-sources">
+            <div class="source-item" data-source="fitbit">
+                <img src="assets/fitbit-logo.svg" alt="Fitbit" width="40">
+                <div class="source-info">
+                    <h4>Fitbit</h4>
+                    <p>Steps, heart rate, sleep</p>
+                </div>
+                <button class="connect-btn">Connect</button>
+            </div>
+            <div class="source-item" data-source="apple_health">
+                <img src="assets/apple-health-logo.svg" alt="Apple Health" width="40">
+                <div class="source-info">
+                    <h4>Apple Health</h4>
+                    <p>Activity, nutrition, vitals</p>
+                </div>
+                <button class="connect-btn">Connect</button>
+            </div>
+        </div>
+        <div class="data-permissions">
+            <h4>Data Permissions</h4>
+            <div class="permission-item">
+                <input type="checkbox" id="permit_activity" checked>
+                <label for="permit_activity">Activity data</label>
+            </div>
+            <div class="permission-item">
+                <input type="checkbox" id="permit_sleep" checked>
+                <label for="permit_sleep">Sleep data</label>
+            </div>
+            <div class="permission-item">
+                <input type="checkbox" id="permit_nutrition">
+                <label for="permit_nutrition">Nutrition data</label>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Typing Settings -->
+<div class="typing-settings">
+    <div class="typing-mode">
+        <label>
+            <input type="checkbox" id="typingPrediction">
+            <span>Enable typing predictions</span>
+        </label>
+    </div>
+    <div class="spell-check">
+        <label>
+            <input type="checkbox" id="spellCheck" checked>
+            <span>Spell check</span>
+        </label>
+    </div>
+</div>
+
+<!-- Notification Center -->
+<div class="notification-center" id="notificationCenter">
+    <div class="notification-header">
+        <h3>Notifications</h3>
+        <button class="clear-notifications" id="clearNotificationsBtn">
+            Clear All
+        </button>
+    </div>
+    <div class="notification-list">
+        <div class="notification-item unread">
+            <i class="fas fa-bell"></i>
+            <div class="notification-content">
+                <p>Your workout summary is ready</p>
+                <span>2 minutes ago</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chat Status Indicators -->
+<div class="chat-status">
+    <div class="status-indicator online" id="connectionStatus">
+        <span class="status-dot"></span>
+        <span class="status-text">Connected to HealthAI</span>
+    </div>
+    <div class="status-message" id="lastSeen">
+        Last updated: Just now
+    </div>
+</div>
+
+<!-- AI Thinking Insights -->
+<div class="ai-thinking" id="aiThinking">
+    <div class="thinking-header">
+        <i class="fas fa-brain"></i>
+        <span>AI is analyzing your question...</span>
+    </div>
+    <div class="thinking-steps">
+        <div class="step active">Understanding context</div>
+        <div class="step">Checking health guidelines</div>
+        <div class="step">Generating response</div>
+        <div class="step">Verifying accuracy</div>
+    </div>
+</div>
+
+<!-- Context Menu -->
+<div class="context-menu" id="contextMenu">
+    <div class="menu-item" data-action="copy">Copy</div>
+    <div class="menu-item" data-action="translate">Translate</div>
+    <div class="menu-item" data-action="save">Save to notes</div>
+    <div class="menu-item" data-action="share">Share</div>
+    <div class="divider"></div>
+    <div class="menu-item" data-action="report">Report issue</div>
+</div>
+
+<!-- Add to main.css -->
+<link rel="stylesheet" href="styles/chat-enhanced.css">
+
+<!-- Add to script tags -->
+<script src="js/chat-enhanced.js"></script>
+<script src="js/voice-input.js"></script>
+<script src="js/chat-history.js"></script>
+<script src="js/export-utils.js"></script>
 
     <!-- Footer (Same as index.html) -->
     <footer role="contentinfo">
