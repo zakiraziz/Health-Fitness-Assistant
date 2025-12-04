@@ -290,3 +290,144 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+// Dashboard enhancements with user greeting
+document.addEventListener('DOMContentLoaded', function() {
+    // Check authentication
+    if (!auth.isAuthenticated()) {
+        window.location.href = 'index.html';
+        return;
+    }
+
+    // Display user info
+    displayUserGreeting();
+    
+    // Load user stats
+    loadUserStats();
+    
+    // Setup dashboard buttons
+    setupDashboardButtons();
+});
+
+function displayUserGreeting() {
+    const user = auth.getCurrentUser();
+    if (!user) return;
+
+    const greetingElement = document.getElementById('userGreeting');
+    const profilePicElement = document.getElementById('navProfilePic');
+
+    if (greetingElement) {
+        const hour = new Date().getHours();
+        let greeting = 'Good ';
+        if (hour < 12) greeting += 'Morning';
+        else if (hour < 18) greeting += 'Afternoon';
+        else greeting += 'Evening';
+        
+        greetingElement.textContent = `${greeting}, ${user.name}!`;
+    }
+
+    if (profilePicElement && user.profilePic) {
+        profilePicElement.src = user.profilePic;
+        profilePicElement.onclick = () => window.location.href = 'profile.html';
+    }
+}
+
+function loadUserStats() {
+    const user = auth.getCurrentUser();
+    if (!user) return;
+
+    // Update workout stats
+    const completedWorkouts = user.workouts?.filter(w => w.completed).length || 0;
+    const totalMinutes = user.workouts?.reduce((sum, w) => sum + (w.duration || 0), 0) || 0;
+    const activeDays = user.progress?.length || 0;
+
+    // Update DOM elements
+    const stats = {
+        'workoutsCompleted': completedWorkouts,
+        'totalMinutes': totalMinutes,
+        'activeDays': activeDays,
+        'currentWeight': user.fitnessGoals?.currentWeight || '-- kg',
+        'targetWeight': user.fitnessGoals?.targetWeight || '-- kg'
+    };
+
+    for (const [id, value] of Object.entries(stats)) {
+        const element = document.getElementById(id);
+        if (element) {
+            element.textContent = value;
+        }
+    }
+}
+
+function setupDashboardButtons() {
+    // Quick action buttons
+    document.querySelectorAll('.quick-action').forEach(button => {
+        button.addEventListener('click', function() {
+            const action = this.dataset.action;
+            handleQuickAction(action);
+        });
+    });
+
+    // Start workout button
+    const startWorkoutBtn = document.getElementById('startWorkoutBtn');
+    if (startWorkoutBtn) {
+        startWorkoutBtn.addEventListener('click', function() {
+            auth.showNotification('Starting your workout!', 'success');
+            setTimeout(() => {
+                window.location.href = 'workouts.html';
+            }, 1000);
+        });
+    }
+}
+
+function handleQuickAction(action) {
+    switch(action) {
+        case 'logWorkout':
+            window.location.href = 'workouts.html';
+            break;
+        case 'logNutrition':
+            window.location.href = 'nutrition.html';
+            break;
+        case 'viewProgress':
+            window.location.href = 'progress.html';
+            break;
+        case 'chatAssistant':
+            window.location.href = 'chat.html';
+            break;
+        case 'profile':
+            window.location.href = 'profile.html';
+            break;
+        case 'settings':
+            auth.showNotification('Settings will be available soon!', 'info');
+            break;
+    }
+}
+
+// Weekly progress chart (simplified)
+function initializeProgressChart() {
+    const ctx = document.getElementById('progressChart');
+    if (!ctx) return;
+
+    const user = auth.getCurrentUser();
+    const weeklyData = user.progress?.slice(-7) || Array(7).fill(0);
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            datasets: [{
+                label: 'Workout Minutes',
+                data: weeklyData,
+                borderColor: '#4CAF50',
+                backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+}
