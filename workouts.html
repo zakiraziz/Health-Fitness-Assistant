@@ -24,10 +24,9 @@
                     <a href="workouts.html" class="active" aria-current="page">Workouts</a>
                     <a href="nutrition.html">Nutrition</a>
                     <a href="profile.html">Profile</a>
-                    <!-- Update the Start Workout buttons to use instructions -->
-<button class="btn btn-primary start-workout-btn" data-workout="fullbody-beginner">
-    <i class="fas fa-play-circle"></i> Start Workout
-</button>
+                    <button class="btn btn-primary start-workout-btn" data-workout="fullbody-beginner">
+                        <i class="fas fa-play-circle"></i> Start Workout
+                    </button>
                 </div>
                 <div class="auth-buttons" id="authButtons">
                     <button class="btn btn-outline" id="loginBtn">Login</button>
@@ -50,6 +49,112 @@
     <!-- Auth Modal -->
     <div class="auth-modal" id="authModal">
         <!-- Same auth modal as index.html -->
+    </div>
+
+    <!-- Workout Instructions Modal -->
+    <div class="workout-instructions-modal" id="workoutInstructionsModal">
+        <div class="instructions-container">
+            <div class="instructions-header">
+                <h2 id="workoutInstructionsTitle">Full Body Beginner Workout</h2>
+                <div class="workout-meta">
+                    <span><i class="fas fa-clock"></i> <span id="workoutTime">30 minutes</span></span>
+                    <span><i class="fas fa-fire"></i> <span id="workoutCalories">240 calories</span></span>
+                    <span><i class="fas fa-signal"></i> <span id="workoutLevel">Beginner</span></span>
+                </div>
+                <button class="close-instructions" id="closeInstructionsBtn">&times;</button>
+            </div>
+            <div class="instructions-content">
+                <div class="workout-overview">
+                    <h3>Workout Overview</h3>
+                    <p id="workoutDescription">A complete full-body workout perfect for those just starting their fitness journey.</p>
+                </div>
+                
+                <div class="instruction-section">
+                    <h3><i class="fas fa-dumbbell"></i> Exercises</h3>
+                    <div class="exercises-list" id="exercisesList"></div>
+                </div>
+                
+                <div class="instruction-section">
+                    <h3><i class="fas fa-clipboard-check"></i> Equipment Needed</h3>
+                    <div class="equipment-list" id="equipmentList"></div>
+                </div>
+                
+                <div class="instruction-section">
+                    <h3><i class="fas fa-lightbulb"></i> Tips & Notes</h3>
+                    <div class="tips" id="workoutTips"></div>
+                </div>
+            </div>
+            <div class="instructions-actions">
+                <button class="btn btn-primary start-workout-timer">
+                    <i class="fas fa-play"></i> Start Workout Timer
+                </button>
+                <button class="btn btn-outline save-instructions">
+                    <i class="fas fa-bookmark"></i> Save Workout
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Timer Modal -->
+    <div class="timer-modal" id="timerModal">
+        <div class="timer-container">
+            <div class="timer-header">
+                <h2 id="timerWorkoutName">Full Body Beginner</h2>
+                <button class="close-timer" id="closeTimerBtn">&times;</button>
+            </div>
+            <div class="timer-content">
+                <div class="current-exercise">
+                    <h3 id="currentExerciseName">Warm-up</h3>
+                    <p id="currentExerciseDescription">Dynamic stretching and light cardio</p>
+                </div>
+                
+                <div class="timer-display">
+                    <div class="time-circle">
+                        <div class="time" id="timerDisplay">10:00</div>
+                    </div>
+                </div>
+                
+                <div class="timer-controls">
+                    <button class="btn btn-primary" id="startTimerBtn">
+                        <i class="fas fa-play"></i> Start
+                    </button>
+                    <button class="btn btn-warning" id="pauseTimerBtn" disabled>
+                        <i class="fas fa-pause"></i> Pause
+                    </button>
+                    <button class="btn btn-danger" id="resetTimerBtn" disabled>
+                        <i class="fas fa-redo"></i> Reset
+                    </button>
+                </div>
+                
+                <div class="exercise-progress">
+                    <div class="progress-bar">
+                        <div class="progress" id="workoutProgress" style="width: 0%"></div>
+                    </div>
+                    <div class="progress-text">
+                        <span id="currentExerciseIndex">1</span> of <span id="totalExercises">8</span> exercises
+                    </div>
+                </div>
+                
+                <div class="workout-stats">
+                    <div class="stat">
+                        <span class="stat-value" id="completedExercises">0</span>
+                        <span class="stat-label">Completed</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value" id="totalTimeElapsed">0:00</span>
+                        <span class="stat-label">Time</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value" id="caloriesBurned">0</span>
+                        <span class="stat-label">Calories</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value" id="heartRate">--</span>
+                        <span class="stat-label">BPM</span>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Workout Plan Modal -->
@@ -192,7 +297,7 @@
                         <i class="fas fa-dumbbell"></i>
                     </div>
                     <div class="stat-info">
-                        <h3 id="totalWorkouts">24</h3>
+                        <h3 id="totalWorkoutsCount">24</h3>
                         <p>Total Workouts Available</p>
                     </div>
                 </div>
@@ -255,9 +360,9 @@
                             <span>4.5 (128 reviews)</span>
                         </div>
                         <div class="workout-actions">
-                            <a href="workout-detail.html?workout=fullbody-beginner" class="btn btn-primary">
+                            <button class="btn btn-primary start-workout-btn" data-workout="fullbody-beginner">
                                 <i class="fas fa-play-circle"></i> Start Workout
-                            </a>
+                            </button>
                             <button class="btn btn-outline view-plan-btn" data-workout="fullbody-beginner">
                                 <i class="fas fa-eye"></i> View Plan
                             </button>
@@ -293,9 +398,9 @@
                             <span>5.0 (89 reviews)</span>
                         </div>
                         <div class="workout-actions">
-                            <a href="workout-detail.html?workout=hiit-cardio" class="btn btn-primary">
+                            <button class="btn btn-primary start-workout-btn" data-workout="hiit-cardio">
                                 <i class="fas fa-play-circle"></i> Start Workout
-                            </a>
+                            </button>
                             <button class="btn btn-outline view-plan-btn" data-workout="hiit-cardio">
                                 <i class="fas fa-eye"></i> View Plan
                             </button>
@@ -306,8 +411,389 @@
                     </div>
                 </div>
 
-                <!-- Add more workout cards here... -->
+                <!-- Yoga Flow -->
+                <div class="workout-card" data-level="beginner" data-type="yoga">
+                    <div class="workout-image">
+                        <img src="https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1420&q=80" alt="Yoga Flow">
+                        <span class="workout-level beginner">Beginner</span>
+                        <div class="workout-badge new">
+                            <i class="fas fa-leaf"></i> New
+                        </div>
+                    </div>
+                    <div class="workout-content">
+                        <h3>Morning Yoga Flow</h3>
+                        <p>Gentle yoga sequence to awaken your body, improve flexibility, and calm your mind.</p>
+                        <div class="workout-details">
+                            <span><i class="fas fa-clock"></i> 25 mins</span>
+                            <span><i class="fas fa-peace"></i> Relaxing</span>
+                            <span><i class="fas fa-fire"></i> 180 cal</span>
+                        </div>
+                        <div class="workout-rating">
+                            <div class="stars">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star-half-alt"></i>
+                            </div>
+                            <span>4.3 (92 reviews)</span>
+                        </div>
+                        <div class="workout-actions">
+                            <button class="btn btn-primary start-workout-btn" data-workout="yoga-flow">
+                                <i class="fas fa-play-circle"></i> Start Workout
+                            </button>
+                            <button class="btn btn-outline view-plan-btn" data-workout="yoga-flow">
+                                <i class="fas fa-eye"></i> View Plan
+                            </button>
+                            <button class="btn btn-outline save-workout-btn">
+                                <i class="far fa-bookmark"></i> Save
+                            </button>
+                        </div>
+                    </div>
+                </div>
 
+                <!-- Advanced Strength -->
+                <div class="workout-card" data-level="advanced" data-type="strength">
+                    <div class="workout-image">
+                        <img src="https://images.unsplash.com/photo-1534367507877-0edd93bd013b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Advanced Strength">
+                        <span class="workout-level advanced">Advanced</span>
+                    </div>
+                    <div class="workout-content">
+                        <h3>Power Building Program</h3>
+                        <p>Build serious strength and muscle mass with this advanced powerbuilding routine.</p>
+                        <div class="workout-details">
+                            <span><i class="fas fa-clock"></i> 60 mins</span>
+                            <span><i class="fas fa-dumbbell"></i> Gym Required</span>
+                            <span><i class="fas fa-fire"></i> 450 cal</span>
+                        </div>
+                        <div class="workout-rating">
+                            <div class="stars">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <span>5.0 (67 reviews)</span>
+                        </div>
+                        <div class="workout-actions">
+                            <button class="btn btn-primary start-workout-btn" data-workout="power-building">
+                                <i class="fas fa-play-circle"></i> Start Workout
+                            </button>
+                            <button class="btn btn-outline view-plan-btn" data-workout="power-building">
+                                <i class="fas fa-eye"></i> View Plan
+                            </button>
+                            <button class="btn btn-outline save-workout-btn">
+                                <i class="far fa-bookmark"></i> Save
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cardio Dance -->
+                <div class="workout-card" data-level="intermediate" data-type="cardio">
+                    <div class="workout-image">
+                        <img src="https://images.unsplash.com/photo-1548690312-e3b507d8c110?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1374&q=80" alt="Cardio Dance">
+                        <span class="workout-level intermediate">Intermediate</span>
+                        <div class="workout-badge">
+                            <i class="fas fa-music"></i> Fun
+                        </div>
+                    </div>
+                    <div class="workout-content">
+                        <h3>Cardio Dance Party</h3>
+                        <p>High-energy dance workout that feels like a party while burning serious calories.</p>
+                        <div class="workout-details">
+                            <span><i class="fas fa-clock"></i> 35 mins</span>
+                            <span><i class="fas fa-music"></i> Dance</span>
+                            <span><i class="fas fa-fire"></i> 380 cal</span>
+                        </div>
+                        <div class="workout-rating">
+                            <div class="stars">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <span>4.9 (143 reviews)</span>
+                        </div>
+                        <div class="workout-actions">
+                            <button class="btn btn-primary start-workout-btn" data-workout="cardio-dance">
+                                <i class="fas fa-play-circle"></i> Start Workout
+                            </button>
+                            <button class="btn btn-outline view-plan-btn" data-workout="cardio-dance">
+                                <i class="fas fa-eye"></i> View Plan
+                            </button>
+                            <button class="btn btn-outline save-workout-btn">
+                                <i class="far fa-bookmark"></i> Save
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Core Strength -->
+                <div class="workout-card" data-level="intermediate" data-type="strength">
+                    <div class="workout-image">
+                        <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Core Strength">
+                        <span class="workout-level intermediate">Intermediate</span>
+                    </div>
+                    <div class="workout-content">
+                        <h3>Core Crusher</h3>
+                        <p>Target all your core muscles with this intense ab and oblique focused workout.</p>
+                        <div class="workout-details">
+                            <span><i class="fas fa-clock"></i> 20 mins</span>
+                            <span><i class="fas fa-dumbbell"></i> Bodyweight</span>
+                            <span><i class="fas fa-fire"></i> 200 cal</span>
+                        </div>
+                        <div class="workout-rating">
+                            <div class="stars">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star-half-alt"></i>
+                            </div>
+                            <span>4.7 (118 reviews)</span>
+                        </div>
+                        <div class="workout-actions">
+                            <button class="btn btn-primary start-workout-btn" data-workout="core-crusher">
+                                <i class="fas fa-play-circle"></i> Start Workout
+                            </button>
+                            <button class="btn btn-outline view-plan-btn" data-workout="core-crusher">
+                                <i class="fas fa-eye"></i> View Plan
+                            </button>
+                            <button class="btn btn-outline save-workout-btn">
+                                <i class="far fa-bookmark"></i> Save
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Featured Workout Plans -->
+            <div class="featured-plans-section">
+                <div class="section-header">
+                    <h2>Featured Workout Plans</h2>
+                    <p>Multi-week programs designed for specific goals</p>
+                </div>
+                
+                <div class="plans-grid">
+                    <div class="plan-card premium">
+                        <div class="plan-badge">30-DAY PLAN</div>
+                        <div class="plan-content">
+                            <h3>30-Day Weight Loss Challenge</h3>
+                            <p>Transform your body with this comprehensive weight loss program</p>
+                            <div class="plan-details">
+                                <span><i class="fas fa-calendar-alt"></i> 30 days</span>
+                                <span><i class="fas fa-dumbbell"></i> 5x/week</span>
+                                <span><i class="fas fa-fire"></i> 350 cal avg</span>
+                            </div>
+                            <div class="plan-stats">
+                                <div class="stat">
+                                    <span class="stat-value">-12 lbs</span>
+                                    <span class="stat-label">Average Loss</span>
+                                </div>
+                                <div class="stat">
+                                    <span class="stat-value">95%</span>
+                                    <span class="stat-label">Completion Rate</span>
+                                </div>
+                            </div>
+                            <button class="btn btn-primary view-plan-details" data-plan="weight-loss-30">
+                                <i class="fas fa-eye"></i> View Plan Details
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="plan-card">
+                        <div class="plan-badge">8-WEEK PLAN</div>
+                        <div class="plan-content">
+                            <h3>Muscle Building Program</h3>
+                            <p>Build lean muscle mass with this science-based strength program</p>
+                            <div class="plan-details">
+                                <span><i class="fas fa-calendar-alt"></i> 8 weeks</span>
+                                <span><i class="fas fa-dumbbell"></i> 4x/week</span>
+                                <span><i class="fas fa-muscle"></i> Strength</span>
+                            </div>
+                            <div class="plan-stats">
+                                <div class="stat">
+                                    <span class="stat-value">+5 lbs</span>
+                                    <span class="stat-label">Muscle Gain</span>
+                                </div>
+                                <div class="stat">
+                                    <span class="stat-value">88%</span>
+                                    <span class="stat-label">Satisfaction</span>
+                                </div>
+                            </div>
+                            <button class="btn btn-primary view-plan-details" data-plan="muscle-building-8">
+                                <i class="fas fa-eye"></i> View Plan Details
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Workout Challenges -->
+            <div class="challenges-section">
+                <div class="section-header">
+                    <h2>Weekly Challenges</h2>
+                    <p>Compete with friends and earn rewards</p>
+                </div>
+                
+                <div class="challenges-grid">
+                    <div class="challenge-card">
+                        <div class="challenge-header">
+                            <h3>10K Steps Challenge</h3>
+                            <span class="challenge-duration">7 days</span>
+                        </div>
+                        <div class="challenge-progress">
+                            <div class="progress-bar">
+                                <div class="progress" style="width: 65%"></div>
+                            </div>
+                            <span class="progress-text">65% of participants completed</span>
+                        </div>
+                        <div class="challenge-reward">
+                            <i class="fas fa-trophy"></i>
+                            <span>Earn: 500 points</span>
+                        </div>
+                        <button class="btn btn-outline join-challenge">
+                            <i class="fas fa-plus"></i> Join Challenge
+                        </button>
+                    </div>
+                    
+                    <div class="challenge-card active">
+                        <div class="challenge-header">
+                            <h3>Core Strength Challenge</h3>
+                            <span class="challenge-duration">21 days</span>
+                        </div>
+                        <div class="challenge-progress">
+                            <div class="progress-bar">
+                                <div class="progress" style="width: 42%"></div>
+                            </div>
+                            <span class="progress-text">42% completed</span>
+                        </div>
+                        <div class="challenge-reward">
+                            <i class="fas fa-medal"></i>
+                            <span>Earn: Gold Badge</span>
+                        </div>
+                        <button class="btn btn-primary">
+                            <i class="fas fa-play"></i> Continue
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Personalized Recommendations -->
+            <div class="recommendations-section">
+                <div class="section-header">
+                    <h2>Personalized For You</h2>
+                    <p>Based on your fitness profile and goals</p>
+                </div>
+                
+                <div class="recommendations-carousel" id="recommendationsCarousel">
+                    <div class="recommendation-card">
+                        <div class="rec-badge">
+                            <i class="fas fa-heart"></i> Recommended
+                        </div>
+                        <h4>Based on your goal: Weight Loss</h4>
+                        <p>Try our HIIT Cardio Blast 3x per week for optimal results</p>
+                        <div class="rec-actions">
+                            <button class="btn btn-primary start-workout-btn" data-workout="hiit-cardio">
+                                <i class="fas fa-play"></i> Start Now
+                            </button>
+                            <button class="btn btn-outline view-plan-btn" data-workout="hiit-cardio">
+                                <i class="fas fa-info-circle"></i> Learn More
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="recommendation-card">
+                        <div class="rec-badge">
+                            <i class="fas fa-bolt"></i> Trending
+                        </div>
+                        <h4>Popular in your age group</h4>
+                        <p>Users aged 25-35 love the Full Body Beginner workout</p>
+                        <div class="rec-actions">
+                            <button class="btn btn-primary start-workout-btn" data-workout="fullbody-beginner">
+                                <i class="fas fa-play"></i> Start Now
+                            </button>
+                            <button class="btn btn-outline view-plan-btn" data-workout="fullbody-beginner">
+                                <i class="fas fa-chart-line"></i> See Stats
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Workout Equipment Shop -->
+            <div class="equipment-section">
+                <div class="section-header">
+                    <h2>Recommended Equipment</h2>
+                    <p>Gear up for your fitness journey</p>
+                </div>
+                
+                <div class="equipment-grid">
+                    <div class="equipment-card">
+                        <img src="https://images.unsplash.com/photo-1599901860904-17e6ed7083a0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Resistance Bands">
+                        <h4>Resistance Bands Set</h4>
+                        <p class="equipment-price">$29.99</p>
+                        <p class="equipment-desc">5-level resistance for full-body workouts</p>
+                        <button class="btn btn-outline add-to-cart-btn">
+                            <i class="fas fa-shopping-cart"></i> Add to Cart
+                        </button>
+                    </div>
+                    
+                    <div class="equipment-card">
+                        <img src="https://images.unsplash.com/photo-1599744357807-bf30f5df2f5f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Yoga Mat">
+                        <h4>Premium Yoga Mat</h4>
+                        <p class="equipment-price">$49.99</p>
+                        <p class="equipment-desc">Non-slip, eco-friendly mat with carrying strap</p>
+                        <button class="btn btn-outline add-to-cart-btn">
+                            <i class="fas fa-shopping-cart"></i> Add to Cart
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Progress Tracker -->
+            <div class="progress-tracker">
+                <div class="tracker-header">
+                    <h3>Your Weekly Progress</h3>
+                    <a href="progress.html" class="view-all">View All Stats →</a>
+                </div>
+                
+                <div class="tracker-grid">
+                    <div class="tracker-item">
+                        <div class="tracker-icon">
+                            <i class="fas fa-dumbbell"></i>
+                        </div>
+                        <div class="tracker-info">
+                            <h4>Workouts Completed</h4>
+                            <p><span class="tracker-value">3</span>/5 workouts this week</p>
+                        </div>
+                        <div class="tracker-progress">
+                            <div class="progress-circle">
+                                <div class="progress" style="--progress: 60%"></div>
+                                <span class="progress-text">60%</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tracker-item">
+                        <div class="tracker-icon">
+                            <i class="fas fa-fire"></i>
+                        </div>
+                        <div class="tracker-info">
+                            <h4>Calories Burned</h4>
+                            <p><span class="tracker-value">1,240</span>/2,000 weekly goal</p>
+                        </div>
+                        <div class="tracker-progress">
+                            <div class="progress-circle">
+                                <div class="progress" style="--progress: 62%"></div>
+                                <span class="progress-text">62%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- Quick Actions Panel -->
@@ -316,7 +802,7 @@
                     <i class="fas fa-bolt"></i>
                 </button>
                 <div class="quick-actions-menu" id="quickActionsMenu">
-                    <a href="workout-detail.html" class="quick-action-item">
+                    <a href="#" class="quick-action-item" id="quickWorkoutBtn">
                         <i class="fas fa-dumbbell"></i>
                         <span>Quick Workout</span>
                     </a>
@@ -371,27 +857,9 @@
             </div>
         </div>
     </footer>
-    
 
+    <!-- JavaScript Files -->
     <script src="js/auth.js"></script>
     <script src="js/workouts.js"></script>
-    <script>
-// Initialize workout instructions
-document.addEventListener('DOMContentLoaded', function() {
-    // Start workout buttons with instructions
-    document.querySelectorAll('.start-workout-btn').forEach(button => {
-        button.addEventListener('click', function() {
-            const workoutId = this.getAttribute('data-workout');
-            workoutInstructions.showWorkoutInstructions(workoutId);
-        });
-    });
-
-    // Update workout detail page start button
-    const startWorkoutBtn = document.querySelector('.start-workout-btn');
-    if (startWorkoutBtn && !startWorkoutBtn.getAttribute('data-workout')) {
-        startWorkoutBtn.setAttribute('data-workout', 'fullbody-beginner');
-    }
-});
-</script>
 </body>
 </html>

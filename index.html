@@ -509,6 +509,97 @@
             </div>
         </div>
     </footer>
+    <!-- Add this to your index.html -->
+<section class="auth-section">
+    <div class="container">
+        <div class="auth-tabs">
+            <button class="tab-btn active" data-tab="signin">Sign In</button>
+            <button class="tab-btn" data-tab="signup">Sign Up</button>
+        </div>
+        
+        <!-- Sign In Form -->
+        <div id="signinTab" class="auth-tab-content active">
+            <div class="auth-container">
+                <h2>Sign In to Your Account</h2>
+                <form id="signinForm" class="auth-form">
+                    <div class="form-group">
+                        <label for="signinEmail">Email Address</label>
+                        <input type="email" id="signinEmail" placeholder="Enter your email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="signinPassword">Password</label>
+                        <input type="password" id="signinPassword" placeholder="Enter your password" required>
+                    </div>
+                    <button type="submit" class="btn-auth">Sign In</button>
+                </form>
+                <div class="auth-links">
+                    <a href="#" id="forgotPassword">Forgot Password?</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sign Up Form -->
+        <div id="signupTab" class="auth-tab-content">
+            <div class="auth-container">
+                <h2>Create New Account</h2>
+                <form id="signupForm" class="auth-form">
+                    <div class="form-group">
+                        <label for="signupName">Full Name</label>
+                        <input type="text" id="signupName" placeholder="Enter your full name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="signupEmail">Email Address</label>
+                        <input type="email" id="signupEmail" placeholder="Enter your email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="signupPassword">Password</label>
+                        <input type="password" id="signupPassword" placeholder="Create a password (min 6 chars)" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="signupConfirmPassword">Confirm Password</label>
+                        <input type="password" id="signupConfirmPassword" placeholder="Confirm your password" required>
+                    </div>
+                    <button type="submit" class="btn-auth">Create Account</button>
+                </form>
+                <div class="auth-links">
+                    <p>Already have an account? <a href="#" class="switch-to-signin">Sign In</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Add this script at the end of body -->
+<script>
+// Tab switching
+document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const tab = btn.dataset.tab;
+        
+        // Update active tab button
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        
+        // Show active tab content
+        document.querySelectorAll('.auth-tab-content').forEach(content => {
+            content.classList.remove('active');
+        });
+        document.getElementById(`${tab}Tab`).classList.add('active');
+    });
+});
+
+// Switch to signin link
+document.querySelector('.switch-to-signin')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelector('[data-tab="signin"]').classList.add('active');
+    
+    document.querySelectorAll('.auth-tab-content').forEach(content => {
+        content.classList.remove('active');
+    });
+    document.getElementById('signinTab').classList.add('active');
+});
+</script>
 
     <!-- Scripts -->
     <script src="js/auth.js"></script>
