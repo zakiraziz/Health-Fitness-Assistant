@@ -3,510 +3,314 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Workouts - HealthAI</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="styles/main.css">
-    <link rel="stylesheet" href="styles/responsive.css">
+    <title>HealthAI - Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: #f5f5f5;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: white;
+            padding: 20px 40px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #6C63FF;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .user-info {
+            text-align: right;
+        }
+
+        .user-name {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .user-email {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .signout-btn {
+            padding: 8px 20px;
+            background: #6C63FF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .signout-btn:hover {
+            background: #4A47B9;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .welcome-banner {
+            background: linear-gradient(135deg, #6C63FF 0%, #4A47B9 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 15px;
+            margin-bottom: 40px;
+        }
+
+        .welcome-banner h1 {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card h2 {
+            color: #333;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-icon {
+            font-size: 24px;
+            color: #6C63FF;
+        }
+
+        .quick-actions {
+            margin-top: 40px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            background: #6C63FF;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background: #4A47B9;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #6C63FF;
+            color: #6C63FF;
+        }
+
+        .btn-outline:hover {
+            background: #6C63FF;
+            color: white;
+        }
+
+        .status-message {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .status-message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            display: block;
+        }
+    </style>
 </head>
 <body>
-    <!-- Header -->
-    <header>
-        <div class="container">
-            <nav class="navbar">
-                <div class="logo">
-                    <i class="fas fa-brain"></i>
-                    <span>HealthAI</span>
-                </div>
-                <div class="nav-links">
-                    <a href="index.html">Home</a>
-                    <a href="chat.html">AI Assistant</a>
-                    <a href="workouts.html" class="active">Workouts</a>
-                    <a href="nutrition.html">Nutrition</a>
-                    <a href="profile.html">Profile</a>
-                </div>
-                <div class="auth-buttons" id="authButtons">
-                    <button class="btn btn-outline" id="loginBtn">Login</button>
-                    <button class="btn btn-primary" id="signupBtn">Sign Up</button>
-                </div>
-                <div class="user-menu" id="userMenu">
-                    <div class="user-avatar" id="userAvatar">JD</div>
-                    <div class="user-dropdown" id="userDropdown">
-                        <a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-                        <a href="profile.html"><i class="fas fa-user"></i> My Profile</a>
-                        <a href="progress.html"><i class="fas fa-chart-line"></i> Progress</a>
-                        <a href="#"><i class="fas fa-cog"></i> Settings</a>
-                        <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</a>
-                    </div>
-                </div>
-            </nav>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="logo">
+            <i class="fas fa-brain"></i>
+            <span>HealthAI</span>
         </div>
-    </header>
-
-    <!-- Auth Modal -->
-    <div class="auth-modal" id="authModal">
-        <div class="auth-container">
-            <div class="auth-header">
-    <h2 id="authModalTitle">Welcome to HealthAI</h2>
-    <p id="authModalSubtitle">Your personal health assistant</p>
-</div>
-            <div class="auth-tabs">
-                <div class="auth-tab active" id="loginTab">Login</div>
-                <div class="auth-tab" id="signupTab">Sign Up</div>
+        
+        <div class="user-menu">
+            <div class="user-info">
+                <div class="user-name" id="userName">Loading...</div>
+                <div class="user-email" id="userEmail">Loading...</div>
             </div>
-            <div class="auth-content">
-                <form class="auth-form active" id="loginForm">
-                    <div class="form-group">
-                        <label for="loginEmail">Email</label>
-                        <input type="email" id="loginEmail" placeholder="Enter your email" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="loginPassword">Password</label>
-                        <input type="password" id="loginPassword" placeholder="Enter your password" required>
-                    </div>
-                    <div class="auth-options">
-                        <div class="remember-me">
-                            <input type="checkbox" id="rememberMe">
-                            <label for="rememberMe">Remember me</label>
-                        </div>
-                        <a href="#" class="forgot-password">Forgot password?</a>
-                    </div>
-                    <button type="submit" class="btn btn-primary" style="width: 100%;">Login</button>
-                    
-                    <div class="social-auth">
-                        <p>Or continue with</p>
-                        <div class="social-buttons">
-                            <div class="social-btn btn-google">
-                                <i class="fab fa-google"></i>
-                            </div>
-                            <div class="social-btn btn-facebook">
-                                <i class="fab fa-facebook-f"></i>
-                            </div>
-                            <div class="social-btn btn-apple">
-                                <i class="fab fa-apple"></i>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-                
-                <form class="auth-form" id="signupForm">
-                    <div class="form-group">
-                        <label for="signupName">Full Name</label>
-                        <input type="text" id="signupName" placeholder="Enter your full name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="signupEmail">Email</label>
-                        <input type="email" id="signupEmail" placeholder="Enter your email" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="signupPassword">Password</label>
-                        <input type="password" id="signupPassword" placeholder="Create a password" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="signupConfirmPassword">Confirm Password</label>
-                        <input type="password" id="signupConfirmPassword" placeholder="Confirm your password" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary" style="width: 100%;">Create Account</button>
-                    
-                    <div class="social-auth">
-                        <p>Or continue with</p>
-                        <div class="social-buttons">
-                            <div class="social-btn btn-google">
-                                <i class="fab fa-google"></i>
-                            </div>
-                            <div class="social-btn btn-facebook">
-                                <i class="fab fa-facebook-f"></i>
-                            </div>
-                            <div class="social-btn btn-apple">
-                                <i class="fab fa-apple"></i>
-                            </div>
-                        </div>
-                    </div>
-                </form>
+            <button class="signout-btn" id="signoutBtn">
+                <i class="fas fa-sign-out-alt"></i> Sign Out
+            </button>
+        </div>
+    </nav>
+
+    <!-- Dashboard Content -->
+    <div class="container">
+        <!-- Error message if not authenticated -->
+        <div id="authError" class="status-message error">
+            You need to be signed in to view this page. Redirecting to sign in...
+        </div>
+
+        <!-- Dashboard Content (shown when authenticated) -->
+        <div id="dashboardContent">
+            <div class="welcome-banner">
+                <h1 id="welcomeMessage">Welcome to HealthAI!</h1>
+                <p>Your personal health and fitness dashboard</p>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="card">
+                    <h2><i class="fas fa-dumbbell card-icon"></i> Workout Plans</h2>
+                    <p>View and manage your personalized workout routines</p>
+                    <a href="workouts.html" class="btn" style="margin-top: 20px;">
+                        <i class="fas fa-play"></i> Start Workout
+                    </a>
+                </div>
+
+                <div class="card">
+                    <h2><i class="fas fa-apple-alt card-icon"></i> Nutrition Guide</h2>
+                    <p>Access personalized meal plans and nutrition advice</p>
+                    <a href="nutrition.html" class="btn" style="margin-top: 20px;">
+                        <i class="fas fa-utensils"></i> View Meals
+                    </a>
+                </div>
+
+                <div class="card">
+                    <h2><i class="fas fa-robot card-icon"></i> AI Assistant</h2>
+                    <p>Chat with our AI for health and fitness advice</p>
+                    <a href="chat.html" class="btn" style="margin-top: 20px;">
+                        <i class="fas fa-comments"></i> Ask HealthAI
+                    </a>
+                </div>
+
+                <div class="card">
+                    <h2><i class="fas fa-chart-line card-icon"></i> Progress</h2>
+                    <p>Track your fitness journey and see your improvements</p>
+                    <a href="progress.html" class="btn" style="margin-top: 20px;">
+                        <i class="fas fa-chart-bar"></i> View Stats
+                    </a>
+                </div>
+            </div>
+
+            <div class="quick-actions">
+                <a href="profile.html" class="btn btn-outline">
+                    <i class="fas fa-user"></i> Edit Profile
+                </a>
+                <a href="index.html" class="btn btn-outline">
+                    <i class="fas fa-home"></i> Back to Home
+                </a>
             </div>
         </div>
     </div>
 
-    <!-- Workouts Section -->
-    <section class="workouts-section">
-        <div class="container">
-            <div class="section-header">
-                <h2>Personalized Workout Plans</h2>
-                <p>Choose from our AI-generated workout plans or create your own custom plan</p>
-            </div>
+    <!-- Load Clerk -->
+    <script src="https://cdn.jsdelivr.net/npm/@clerk/clerk-js@latest/dist/clerk.browser.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
 
-            <!-- Workout Stats -->
-            <div class="workout-stats-overview">
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-dumbbell"></i>
-                    </div>
-                    <div class="stat-info">
-                        <h3 id="totalWorkouts">24</h3>
-                        <p>Total Workouts Available</p>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-clock"></i>
-                    </div>
-                    <div class="stat-info">
-                        <h3 id="avgDuration">35</h3>
-                        <p>Average Duration (mins)</p>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-fire"></i>
-                    </div>
-                    <div class="stat-info">
-                        <h3 id="caloriesAvg">280</h3>
-                        <p>Avg Calories Burned</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="workout-filters">
-                <button class="filter-btn active" data-filter="all">All Workouts</button>
-                <button class="filter-btn" data-filter="beginner">Beginner</button>
-                <button class="filter-btn" data-filter="intermediate">Intermediate</button>
-                <button class="filter-btn" data-filter="advanced">Advanced</button>
-                <button class="filter-btn" data-filter="cardio">Cardio</button>
-                <button class="filter-btn" data-filter="strength">Strength</button>
-                <button class="filter-btn" data-filter="yoga">Yoga & Flexibility</button>
-            </div>
-
-            <div class="workouts-grid">
-                <!-- Full Body Beginner -->
-                <div class="workout-card" data-level="beginner" data-type="strength">
-                    <div class="workout-image">
-                        <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Full Body Workout">
-                        <span class="workout-level beginner">Beginner</span>
-                        <div class="workout-badge">
-                            <i class="fas fa-star"></i> Most Popular
-                        </div>
-                    </div>
-                    <div class="workout-content">
-                        <h3>Full Body Beginner</h3>
-                        <p>A complete full-body workout perfect for those just starting their fitness journey.</p>
-                        <div class="workout-details">
-                            <span><i class="fas fa-clock"></i> 30 mins</span>
-                            <span><i class="fas fa-dumbbell"></i> Bodyweight</span>
-                            <span><i class="fas fa-fire"></i> 240 cal</span>
-                        </div>
-                        <div class="workout-rating">
-                            <div class="stars">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star-half-alt"></i>
-                            </div>
-                            <span>4.5 (128 reviews)</span>
-                        </div>
-                        <div class="workout-actions">
-                            <button class="btn btn-primary start-workout-btn" data-workout="fullbody-beginner">
-    <i class="fas fa-play-circle"></i> Start Workout
-</button>
-                            <button class="btn btn-outline save-workout-btn">
-                                <i class="far fa-bookmark"></i> Save
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- HIIT Cardio -->
-                <div class="workout-card" data-level="intermediate" data-type="cardio">
-                    <div class="workout-image">
-                        <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="HIIT Cardio">
-                        <span class="workout-level intermediate">Intermediate</span>
-                    </div>
-                    <div class="workout-content">
-                        <h3>HIIT Cardio Blast</h3>
-                        <p>High-intensity interval training to boost metabolism and burn calories.</p>
-                        <div class="workout-details">
-                            <span><i class="fas fa-clock"></i> 25 mins</span>
-                            <span><i class="fas fa-fire"></i> High Intensity</span>
-                            <span><i class="fas fa-bolt"></i> 320 cal</span>
-                        </div>
-                        <div class="workout-rating">
-                            <div class="stars">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                            </div>
-                            <span>5.0 (89 reviews)</span>
-                        </div>
-                        <div class="workout-actions">
-                            <a href="workout-detail.html?workout=hiit-cardio" class="btn btn-primary">
-                                <i class="fas fa-play-circle"></i> Start Workout
-                            </a>
-                            <button class="btn btn-outline save-workout-btn">
-                                <i class="far fa-bookmark"></i> Save
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Strength Training -->
-                <div class="workout-card" data-level="advanced" data-type="strength">
-                    <div class="workout-image">
-                        <img src="https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Strength Training">
-                        <span class="workout-level advanced">Advanced</span>
-                        <div class="workout-badge new">
-                            <i class="fas fa-certificate"></i> New
-                        </div>
-                    </div>
-                    <div class="workout-content">
-                        <h3>Advanced Strength Training</h3>
-                        <p>Build muscle and increase strength with this intense weight training program.</p>
-                        <div class="workout-details">
-                            <span><i class="fas fa-clock"></i> 45 mins</span>
-                            <span><i class="fas fa-dumbbell"></i> Weights Required</span>
-                            <span><i class="fas fa-fire"></i> 380 cal</span>
-                        </div>
-                        <div class="workout-rating">
-                            <div class="stars">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="far fa-star"></i>
-                            </div>
-                            <span>4.0 (67 reviews)</span>
-                        </div>
-                        <div class="workout-actions">
-                            <a href="workout-detail.html?workout=strength-advanced" class="btn btn-primary">
-                                <i class="fas fa-play-circle"></i> Start Workout
-                            </a>
-                            <button class="btn btn-outline save-workout-btn">
-                                <i class="far fa-bookmark"></i> Save
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Yoga Flow -->
-                <div class="workout-card" data-level="beginner" data-type="yoga">
-                    <div class="workout-image">
-                        <img src="https://images.unsplash.com/photo-1574680178050-55c6a6a96e0a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1469&q=80" alt="Yoga Flow">
-                        <span class="workout-level beginner">Beginner</span>
-                    </div>
-                    <div class="workout-content">
-                        <h3>Gentle Yoga Flow</h3>
-                        <p>Improve flexibility and reduce stress with this calming yoga sequence.</p>
-                        <div class="workout-details">
-                            <span><i class="fas fa-clock"></i> 40 mins</span>
-                            <span><i class="fas fa-spa"></i> Low Impact</span>
-                            <span><i class="fas fa-heart"></i> 180 cal</span>
-                        </div>
-                        <div class="workout-rating">
-                            <div class="stars">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star-half-alt"></i>
-                            </div>
-                            <span>4.5 (156 reviews)</span>
-                        </div>
-                        <div class="workout-actions">
-                            <a href="workout-detail.html?workout=yoga-beginner" class="btn btn-primary">
-                                <i class="fas fa-play-circle"></i> Start Workout
-                            </a>
-                            <button class="btn btn-outline save-workout-btn">
-                                <i class="far fa-bookmark"></i> Save
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Core Strength -->
-                <div class="workout-card" data-level="intermediate" data-type="strength">
-                    <div class="workout-image">
-                        <img src="https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1520&q=80" alt="Core Workout">
-                        <span class="workout-level intermediate">Intermediate</span>
-                    </div>
-                    <div class="workout-content">
-                        <h3>Core Strength Builder</h3>
-                        <p>Develop a strong core with targeted exercises for abs and back muscles.</p>
-                        <div class="workout-details">
-                            <span><i class="fas fa-clock"></i> 20 mins</span>
-                            <span><i class="fas fa-dumbbell"></i> Bodyweight</span>
-                            <span><i class="fas fa-fire"></i> 200 cal</span>
-                        </div>
-                        <div class="workout-rating">
-                            <div class="stars">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="far fa-star"></i>
-                            </div>
-                            <span>4.0 (92 reviews)</span>
-                        </div>
-                        <div class="workout-actions">
-                            <a href="workout-detail.html?workout=core-strength" class="btn btn-primary">
-                                <i class="fas fa-play-circle"></i> Start Workout
-                            </a>
-                            <button class="btn btn-outline save-workout-btn">
-                                <i class="far fa-bookmark"></i> Save
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Running -->
-                <div class="workout-card" data-level="beginner" data-type="cardio">
-                    <div class="workout-image">
-                        <img src="https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Running">
-                        <span class="workout-level beginner">Beginner</span>
-                    </div>
-                    <div class="workout-content">
-                        <h3>Beginner Running Program</h3>
-                        <p>Start your running journey with this walk-run interval training program.</p>
-                        <div class="workout-details">
-                            <span><i class="fas fa-clock"></i> 35 mins</span>
-                            <span><i class="fas fa-running"></i> Outdoor/Cardio</span>
-                            <span><i class="fas fa-fire"></i> 280 cal</span>
-                        </div>
-                        <div class="workout-rating">
-                            <div class="stars">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star-half-alt"></i>
-                            </div>
-                            <span>4.5 (203 reviews)</span>
-                        </div>
-                        <div class="workout-actions">
-                            <a href="workout-detail.html?workout=running-beginner" class="btn btn-primary">
-                                <i class="fas fa-play-circle"></i> Start Workout
-                            </a>
-                            <button class="btn btn-outline save-workout-btn">
-                                <i class="far fa-bookmark"></i> Save
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Workout Categories -->
-            <div class="workout-categories">
-                <h3>Browse by Category</h3>
-                <div class="categories-grid">
-                    <div class="category-card" data-category="strength">
-                        <div class="category-icon">
-                            <i class="fas fa-dumbbell"></i>
-                        </div>
-                        <h4>Strength Training</h4>
-                        <p>Build muscle and increase strength</p>
-                        <span class="workout-count">8 workouts</span>
-                    </div>
-                    <div class="category-card" data-category="cardio">
-                        <div class="category-icon">
-                            <i class="fas fa-heartbeat"></i>
-                        </div>
-                        <h4>Cardio</h4>
-                        <p>Improve heart health and endurance</p>
-                        <span class="workout-count">6 workouts</span>
-                    </div>
-                    <div class="category-card" data-category="yoga">
-                        <div class="category-icon">
-                            <i class="fas fa-spa"></i>
-                        </div>
-                        <h4>Yoga & Flexibility</h4>
-                        <p>Increase flexibility and reduce stress</p>
-                        <span class="workout-count">5 workouts</span>
-                    </div>
-                    <div class="category-card" data-category="hiit">
-                        <div class="category-icon">
-                            <i class="fas fa-bolt"></i>
-                        </div>
-                        <h4>HIIT</h4>
-                        <p>High-intensity interval training</p>
-                        <span class="workout-count">4 workouts</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="custom-workout">
-                <div class="custom-workout-content">
-                    <div class="custom-workout-text">
-                        <h3>Can't Find What You're Looking For?</h3>
-                        <p>Tell us your goals and preferences, and we'll generate a personalized workout plan just for you.</p>
-                        <ul>
-                            <li><i class="fas fa-check"></i> Customized to your fitness level</li>
-                            <li><i class="fas fa-check"></i> Based on available equipment</li>
-                            <li><i class="fas fa-check"></i> Tailored to your specific goals</li>
-                        </ul>
-                    </div>
-                    <div class="custom-workout-action">
-                        <a href="chat.html" class="btn btn-primary btn-large">
-                            <i class="fas fa-robot"></i> Create Custom Plan
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer>
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <div class="logo">
-                        <i class="fas fa-brain"></i>
-                        <span>HealthAI</span>
-                    </div>
-                    <p>Your personal AI health and fitness assistant for a healthier lifestyle.</p>
-                </div>
-                <div class="footer-section">
-                    <h4>Quick Links</h4>
-                    <ul>
-                        <li><a href="index.html">Home</a></li>
-                        <li><a href="chat.html">AI Assistant</a></li>
-                        <li><a href="workouts.html">Workouts</a></li>
-                        <li><a href="nutrition.html">Nutrition</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>Contact Us</h4>
-                    <ul>
-                        <li><i class="fas fa-envelope"></i> support@healthai.com</li>
-                        <li><i class="fas fa-phone"></i> +1 (555) 123-4567</li>
-                        <li><i class="fas fa-map-marker-alt"></i> 123 Fitness St, Health City</li>
-                    </ul>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; 2023 HealthAI. All rights reserved.</p>
-            </div>
-        </div>
-    </footer>
-
-    <script src="js/auth.js"></script>
-    <script src="js/workouts.js"></script>
     <script>
-// Initialize workout instructions
-document.addEventListener('DOMContentLoaded', function() {
-    // Start workout buttons with instructions
-    document.querySelectorAll('.start-workout-btn').forEach(button => {
-        button.addEventListener('click', function() {
-            const workoutId = this.getAttribute('data-workout');
-            workoutInstructions.showWorkoutInstructions(workoutId);
-        });
-    });
-
-    // Update workout detail page start button
-    const startWorkoutBtn = document.querySelector('.start-workout-btn');
-    if (startWorkoutBtn && !startWorkoutBtn.getAttribute('data-workout')) {
-        startWorkoutBtn.setAttribute('data-workout', 'fullbody-beginner');
-    }
-});
-</script>
+        // Replace with your REAL Clerk key
+        const CLERK_PUBLISHABLE_KEY = 'YOUR_REAL_CLERK_KEY_HERE';
+        
+        // Initialize Clerk
+        async function initDashboard() {
+            try {
+                // Load Clerk
+                await window.Clerk.load({
+                    publishableKey: CLERK_PUBLISHABLE_KEY
+                });
+                
+                const clerk = window.Clerk;
+                
+                // Check authentication
+                if (!clerk.user) {
+                    // Not authenticated, redirect to sign in
+                    document.getElementById('authError').style.display = 'block';
+                    document.getElementById('dashboardContent').style.display = 'none';
+                    
+                    setTimeout(() => {
+                        window.location.href = 'auth.html?redirect=dashboard.html';
+                    }, 2000);
+                    return;
+                }
+                
+                // User is authenticated, show dashboard
+                document.getElementById('authError').style.display = 'none';
+                document.getElementById('dashboardContent').style.display = 'block';
+                
+                // Update user info
+                const userName = document.getElementById('userName');
+                const userEmail = document.getElementById('userEmail');
+                const welcomeMessage = document.getElementById('welcomeMessage');
+                
+                const firstName = clerk.user.firstName || 'User';
+                const email = clerk.user.primaryEmailAddress?.emailAddress || '';
+                
+                if (userName) userName.textContent = firstName;
+                if (userEmail) userEmail.textContent = email;
+                if (welcomeMessage) welcomeMessage.textContent = `Welcome back, ${firstName}!`;
+                
+                // Sign out button
+                document.getElementById('signoutBtn').addEventListener('click', async function() {
+                    await clerk.signOut();
+                    window.location.href = 'auth.html';
+                });
+                
+            } catch (error) {
+                console.error('Dashboard error:', error);
+                document.getElementById('authError').style.display = 'block';
+                document.getElementById('authError').innerHTML = 
+                    'Error loading dashboard. Please try again later.';
+            }
+        }
+        
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', initDashboard);
+    </script>
+    <!-- In index.html, dashboard.html, profile.html, etc. -->
+<script src="js/auth-system.js"></script>
 </body>
 </html>

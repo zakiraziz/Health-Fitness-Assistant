@@ -37,44 +37,161 @@
             100% { transform: rotate(360deg); }
         }
         
-        /* Progress Steps */
-        .progress-steps {
+        /* Clerk specific styles */
+        .clerk-auth-buttons {
             display: flex;
-            justify-content: space-between;
-            margin: 25px 0;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .clerk-user-menu {
+            display: none;
             position: relative;
         }
-        .progress-steps::before {
-            content: '';
-            position: absolute;
-            top: 15px;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: var(--light-gray);
-            z-index: 1;
-        }
-        .step {
-            width: 30px;
-            height: 30px;
+        
+        .clerk-user-avatar {
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
-            background: var(--light-gray);
+            background: linear-gradient(135deg, #6C63FF, #4A47B9);
+            color: white;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--gray);
-            font-weight: 600;
-            font-size: 0.9rem;
-            position: relative;
-            z-index: 2;
+            font-weight: bold;
+            cursor: pointer;
+            border: 2px solid white;
+            transition: transform 0.2s;
         }
-        .step.active {
-            background: var(--primary);
-            color: white;
+        
+        .clerk-user-avatar:hover {
+            transform: scale(1.05);
         }
-        .step.completed {
-            background: var(--success);
-            color: white;
+        
+        .clerk-user-dropdown {
+            position: absolute;
+            top: 50px;
+            right: 0;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            min-width: 200px;
+            display: none;
+            z-index: 1000;
+            overflow: hidden;
+        }
+        
+        .clerk-user-dropdown.active {
+            display: block;
+            animation: fadeIn 0.2s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .clerk-user-dropdown a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 20px;
+            color: #333;
+            text-decoration: none;
+            transition: background 0.2s;
+            border-bottom: 1px solid #f5f5f5;
+        }
+        
+        .clerk-user-dropdown a:last-child {
+            border-bottom: none;
+        }
+        
+        .clerk-user-dropdown a:hover {
+            background: #f8f9fa;
+        }
+        
+        .clerk-user-dropdown .user-info {
+            padding: 15px 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .clerk-user-dropdown hr {
+            margin: 0;
+            border: none;
+            border-top: 1px solid #eee;
+        }
+        
+        /* Toast notifications */
+        .toast-message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            color: #333;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            z-index: 10000;
+            animation: slideIn 0.3s ease;
+            max-width: 350px;
+        }
+        
+        .toast-message.toast-success {
+            border-left: 4px solid #10B981;
+        }
+        
+        .toast-message.toast-error {
+            border-left: 4px solid #EF4444;
+        }
+        
+        .toast-message.toast-info {
+            border-left: 4px solid #3B82F6;
+        }
+        
+        .toast-message button {
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            font-size: 18px;
+            padding: 0;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background 0.2s;
+        }
+        
+        .toast-message button:hover {
+            background: rgba(0,0,0,0.1);
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .clerk-auth-buttons {
+                gap: 5px;
+            }
+            
+            .clerk-user-dropdown {
+                position: fixed;
+                top: 70px;
+                left: 0;
+                right: 0;
+                margin: 0 10px;
+                min-width: auto;
+            }
         }
     </style>
 </head>
@@ -99,294 +216,40 @@
                     <a href="nutrition.html">Nutrition</a>
                     <a href="profile.html">Profile</a>
                 </div>
-                <div class="auth-buttons" id="authButtons">
-                    <button class="btn btn-outline" id="loginBtn" aria-label="Login to HealthAI">Login</button>
-                    <button class="btn btn-primary" id="signupBtn" aria-label="Sign up for HealthAI">Sign Up</button>
+                
+                <!-- Clerk Authentication Buttons -->
+                <div id="authButtons" class="clerk-auth-buttons">
+                    <button class="btn btn-outline" id="loginBtn" aria-label="Login to HealthAI">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </button>
+                    <button class="btn btn-primary" id="signupBtn" aria-label="Sign up for HealthAI">
+                        <i class="fas fa-user-plus"></i> Sign Up
+                    </button>
                 </div>
-                <div class="user-menu" id="userMenu">
-                    <button class="user-avatar" id="userAvatar" aria-label="User menu" aria-expanded="false">JD</button>
-                    <div class="user-dropdown" id="userDropdown" role="menu">
+                
+                <!-- Clerk User Menu -->
+                <div id="userMenu" class="clerk-user-menu">
+                    <div class="clerk-user-avatar" id="userAvatar" aria-label="User menu" aria-expanded="false">
+                        U
+                    </div>
+                    <div class="clerk-user-dropdown" id="userDropdown" role="menu">
+                        <div class="user-info">
+                            <strong id="userName">User</strong>
+                            <div class="user-email" id="userEmail" style="font-size: 12px; color: #666; margin-top: 5px;">Loading...</div>
+                        </div>
                         <a href="dashboard.html" role="menuitem"><i class="fas fa-tachometer-alt" aria-hidden="true"></i> Dashboard</a>
                         <a href="profile.html" role="menuitem"><i class="fas fa-user" aria-hidden="true"></i> My Profile</a>
                         <a href="progress.html" role="menuitem"><i class="fas fa-chart-line" aria-hidden="true"></i> Progress</a>
-                        <a href="#" role="menuitem"><i class="fas fa-cog" aria-hidden="true"></i> Settings</a>
-                        <a href="#" id="logoutBtn" role="menuitem"><i class="fas fa-sign-out-alt" aria-hidden="true"></i> Logout</a>
+                        <a href="settings.html" role="menuitem"><i class="fas fa-cog" aria-hidden="true"></i> Settings</a>
+                        <hr>
+                        <a href="#" id="logoutBtn" role="menuitem" style="color: #EF4444;">
+                            <i class="fas fa-sign-out-alt" aria-hidden="true"></i> Logout
+                        </a>
                     </div>
                 </div>
             </nav>
         </div>
     </header>
-
-    <!-- Auth Modal -->
-    <div class="auth-modal" id="authModal" role="dialog" aria-labelledby="authModalTitle" aria-hidden="true">
-        <div class="auth-container">
-            <div class="auth-header">
-                <h2 id="authModalTitle">Welcome to HealthAI</h2>
-                <p id="authModalSubtitle">Your personal health assistant</p>
-                <button class="close-auth" id="closeAuth" aria-label="Close authentication modal">&times;</button>
-            </div>
-            
-            <!-- Progress Steps for Signup -->
-            <div class="progress-steps" id="progressSteps" style="display: none;">
-                <div class="step active" id="step1">1</div>
-                <div class="step" id="step2">2</div>
-                <div class="step" id="step3">3</div>
-            </div>
-            
-            <div class="auth-tabs" role="tablist">
-                <button class="auth-tab active" id="loginTab" role="tab" aria-selected="true" aria-controls="loginForm">Login</button>
-                <button class="auth-tab" id="signupTab" role="tab" aria-selected="false" aria-controls="signupForm">Sign Up</button>
-            </div>
-            
-            <div class="auth-content">
-                <!-- Login Form -->
-                <form class="auth-form active" id="loginForm" role="tabpanel" aria-labelledby="loginTab">
-                    <div class="form-group">
-                        <label for="loginEmail">Email</label>
-                        <input type="email" id="loginEmail" placeholder="Enter your email" required aria-required="true">
-                    </div>
-                    <div class="form-group">
-                        <label for="loginPassword">Password</label>
-                        <input type="password" id="loginPassword" placeholder="Enter your password" required aria-required="true">
-                    </div>
-                    <div class="auth-options">
-                        <div class="remember-me">
-                            <input type="checkbox" id="rememberMe">
-                            <label for="rememberMe">Remember me</label>
-                        </div>
-                        <a href="#" class="forgot-password">Forgot password?</a>
-                    </div>
-                    <button type="submit" class="btn btn-primary" style="width: 100%;">Login</button>
-                    
-                    <div class="social-auth">
-                        <p>Or continue with</p>
-                        <div class="social-buttons">
-                            <button type="button" class="social-btn btn-google" aria-label="Sign in with Google">
-                                <i class="fab fa-google" aria-hidden="true"></i>
-                            </button>
-                            <button type="button" class="social-btn btn-facebook" aria-label="Sign in with Facebook">
-                                <i class="fab fa-facebook-f" aria-hidden="true"></i>
-                            </button>
-                            <button type="button" class="social-btn btn-apple" aria-label="Sign in with Apple">
-                                <i class="fab fa-apple" aria-hidden="true"></i>
-                            </button>
-                        </div>
-                    </div>
-                </form>
-                
-                <!-- Basic Signup Form -->
-                <form class="auth-form" id="signupForm" role="tabpanel" aria-labelledby="signupTab" hidden>
-                    <div class="form-group">
-                        <label for="signupName">Full Name</label>
-                        <input type="text" id="signupName" placeholder="Enter your full name" required aria-required="true">
-                    </div>
-                    <div class="form-group">
-                        <label for="signupEmail">Email</label>
-                        <input type="email" id="signupEmail" placeholder="Enter your email" required aria-required="true">
-                    </div>
-                    <div class="form-group">
-                        <label for="signupPassword">Password</label>
-                        <input type="password" id="signupPassword" placeholder="Create a password" required aria-required="true" minlength="6">
-                    </div>
-                    <div class="form-group">
-                        <label for="signupConfirmPassword">Confirm Password</label>
-                        <input type="password" id="signupConfirmPassword" placeholder="Confirm your password" required aria-required="true">
-                    </div>
-                    <button type="submit" class="btn btn-primary" style="width: 100%;">Continue to Health Details</button>
-                    
-                    <div class="social-auth">
-                        <p>Or continue with</p>
-                        <div class="social-buttons">
-                            <button type="button" class="social-btn btn-google" aria-label="Sign up with Google">
-                                <i class="fab fa-google" aria-hidden="true"></i>
-                            </button>
-                            <button type="button" class="social-btn btn-facebook" aria-label="Sign up with Facebook">
-                                <i class="fab fa-facebook-f" aria-hidden="true"></i>
-                            </button>
-                            <button type="button" class="social-btn btn-apple" aria-label="Sign up with Apple">
-                                <i class="fab fa-apple" aria-hidden="true"></i>
-                            </button>
-                        </div>
-                    </div>
-                </form>
-                
-                <!-- Health Details Form -->
-                <form class="auth-form" id="healthDetailsForm" hidden>
-                    <h3 style="margin-bottom: 20px; color: var(--secondary);">Tell us about yourself</h3>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="userAge">Age</label>
-                            <input type="number" id="userAge" min="13" max="100" placeholder="Your age" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="userGender">Gender</label>
-                            <select id="userGender" required>
-                                <option value="">Select Gender</option>
-                                <option value="male">Male</option>
-                                <option value="female">Female</option>
-                                <option value="other">Other</option>
-                                <option value="prefer-not-to-say">Prefer not to say</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="userHeight">Height (cm)</label>
-                            <input type="number" id="userHeight" min="100" max="250" placeholder="Your height" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="userWeight">Weight (kg)</label>
-                            <input type="number" id="userWeight" min="30" max="300" step="0.1" placeholder="Your weight" required>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="userFitnessLevel">Fitness Level</label>
-                        <select id="userFitnessLevel" required>
-                            <option value="">Select your fitness level</option>
-                            <option value="beginner">Beginner - New to exercise</option>
-                            <option value="intermediate">Intermediate - Exercise occasionally</option>
-                            <option value="advanced">Advanced - Regular exerciser</option>
-                            <option value="athlete">Athlete - Competitive training</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Fitness Goals (Select all that apply)</label>
-                        <div class="checkbox-group">
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="goals" value="weight-loss"> 
-                                <span class="checkmark"></span>
-                                Weight Loss
-                            </label>
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="goals" value="muscle-gain">
-                                <span class="checkmark"></span>
-                                Muscle Building
-                            </label>
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="goals" value="endurance">
-                                <span class="checkmark"></span>
-                                Endurance
-                            </label>
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="goals" value="flexibility">
-                                <span class="checkmark"></span>
-                                Flexibility
-                            </label>
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="goals" value="general-health">
-                                <span class="checkmark"></span>
-                                General Health
-                            </label>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="userActivity">Daily Activity Level</label>
-                        <select id="userActivity" required>
-                            <option value="">Select your activity level</option>
-                            <option value="sedentary">Sedentary (little to no exercise)</option>
-                            <option value="light">Light (light exercise 1-3 days/week)</option>
-                            <option value="moderate">Moderate (moderate exercise 3-5 days/week)</option>
-                            <option value="active">Active (hard exercise 6-7 days/week)</option>
-                            <option value="very-active">Very Active (physical job + exercise)</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-actions">
-                        <button type="button" class="btn btn-outline" id="backToSignup">Back</button>
-                        <button type="submit" class="btn btn-primary">Continue to Goals</button>
-                    </div>
-                </form>
-                
-                <!-- Fitness Goals Form -->
-                <form class="auth-form" id="fitnessGoalsForm" hidden>
-                    <h3 style="margin-bottom: 20px; color: var(--secondary);">Set Your Fitness Goals</h3>
-                    
-                    <div class="form-group">
-                        <label for="targetWeight">Target Weight (kg)</label>
-                        <input type="number" id="targetWeight" min="30" max="300" step="0.1" placeholder="Your target weight">
-                        <small>Leave blank if you don't have a specific weight goal</small>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="workoutFrequency">Workout Frequency</label>
-                        <select id="workoutFrequency" required>
-                            <option value="">How often do you want to exercise?</option>
-                            <option value="1-2">1-2 times per week</option>
-                            <option value="3-4">3-4 times per week</option>
-                            <option value="5-6">5-6 times per week</option>
-                            <option value="daily">Daily</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="workoutDuration">Preferred Workout Duration</label>
-                        <select id="workoutDuration" required>
-                            <option value="">Select preferred duration</option>
-                            <option value="15-30">15-30 minutes</option>
-                            <option value="30-45">30-45 minutes</option>
-                            <option value="45-60">45-60 minutes</option>
-                            <option value="60+">60+ minutes</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="availableEquipment">Available Equipment</label>
-                        <div class="checkbox-group">
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="equipment" value="bodyweight">
-                                <span class="checkmark"></span>
-                                Bodyweight only
-                            </label>
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="equipment" value="dumbbells">
-                                <span class="checkmark"></span>
-                                Dumbbells
-                            </label>
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="equipment" value="resistance-bands">
-                                <span class="checkmark"></span>
-                                Resistance Bands
-                            </label>
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="equipment" value="yoga-mat">
-                                <span class="checkmark"></span>
-                                Yoga Mat
-                            </label>
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="equipment" value="full-gym">
-                                <span class="checkmark"></span>
-                                Full Gym Access
-                            </label>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="dietaryPreference">Dietary Preference</label>
-                        <select id="dietaryPreference" required>
-                            <option value="">Select your dietary preference</option>
-                            <option value="balanced">Balanced</option>
-                            <option value="vegetarian">Vegetarian</option>
-                            <option value="vegan">Vegan</option>
-                            <option value="keto">Keto</option>
-                            <option value="paleo">Paleo</option>
-                            <option value="mediterranean">Mediterranean</option>
-                            <option value="no-restriction">No Restrictions</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-actions">
-                        <button type="button" class="btn btn-outline" id="backToHealth">Back</button>
-                        <button type="submit" class="btn btn-primary">Complete Registration</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
 
     <!-- Hero Section -->
     <section class="hero" role="region" aria-labelledby="hero-title">
@@ -509,113 +372,29 @@
             </div>
         </div>
     </footer>
-    <!-- Add this to your index.html -->
-<section class="auth-section">
-    <div class="container">
-        <div class="auth-tabs">
-            <button class="tab-btn active" data-tab="signin">Sign In</button>
-            <button class="tab-btn" data-tab="signup">Sign Up</button>
-        </div>
-        
-        <!-- Sign In Form -->
-        <div id="signinTab" class="auth-tab-content active">
-            <div class="auth-container">
-                <h2>Sign In to Your Account</h2>
-                <form id="signinForm" class="auth-form">
-                    <div class="form-group">
-                        <label for="signinEmail">Email Address</label>
-                        <input type="email" id="signinEmail" placeholder="Enter your email" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="signinPassword">Password</label>
-                        <input type="password" id="signinPassword" placeholder="Enter your password" required>
-                    </div>
-                    <button type="submit" class="btn-auth">Sign In</button>
-                </form>
-                <div class="auth-links">
-                    <a href="#" id="forgotPassword">Forgot Password?</a>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Sign Up Form -->
-        <div id="signupTab" class="auth-tab-content">
-            <div class="auth-container">
-                <h2>Create New Account</h2>
-                <form id="signupForm" class="auth-form">
-                    <div class="form-group">
-                        <label for="signupName">Full Name</label>
-                        <input type="text" id="signupName" placeholder="Enter your full name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="signupEmail">Email Address</label>
-                        <input type="email" id="signupEmail" placeholder="Enter your email" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="signupPassword">Password</label>
-                        <input type="password" id="signupPassword" placeholder="Create a password (min 6 chars)" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="signupConfirmPassword">Confirm Password</label>
-                        <input type="password" id="signupConfirmPassword" placeholder="Confirm your password" required>
-                    </div>
-                    <button type="submit" class="btn-auth">Create Account</button>
-                </form>
-                <div class="auth-links">
-                    <p>Already have an account? <a href="#" class="switch-to-signin">Sign In</a></p>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
 
-<!-- Add this script at the end of body -->
-<script>
-// Tab switching
-document.querySelectorAll('.tab-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-        const tab = btn.dataset.tab;
-        
-        // Update active tab button
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        
-        // Show active tab content
-        document.querySelectorAll('.auth-tab-content').forEach(content => {
-            content.classList.remove('active');
-        });
-        document.getElementById(`${tab}Tab`).classList.add('active');
-    });
-});
+    <!-- Load Clerk SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@clerk/clerk-js@latest/dist/clerk.browser.js"></script>
 
-// Switch to signin link
-document.querySelector('.switch-to-signin')?.addEventListener('click', (e) => {
-    e.preventDefault();
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.querySelector('[data-tab="signin"]').classList.add('active');
-    
-    document.querySelectorAll('.auth-tab-content').forEach(content => {
-        content.classList.remove('active');
-    });
-    document.getElementById('signinTab').classList.add('active');
-});
-</script>
-
-    <!-- Scripts -->
-    <script src="js/auth.js"></script>
+    <!-- Main Script -->
     <script>
         // Remove loading screen when page loads
-        window.addEventListener('load', function() {
+        document.addEventListener('DOMContentLoaded', function() {
             const loadingScreen = document.getElementById('loadingScreen');
             if (loadingScreen) {
-                loadingScreen.style.opacity = '0';
                 setTimeout(() => {
-                    loadingScreen.remove();
+                    loadingScreen.style.opacity = '0';
+                    setTimeout(() => {
+                        loadingScreen.remove();
+                    }, 500);
                 }, 500);
             }
+            
+            // Initialize application
+            initApp();
         });
 
-        // Fallback if load event doesn't fire
+        // Fallback if DOMContentLoaded doesn't fire
         setTimeout(() => {
             const loadingScreen = document.getElementById('loadingScreen');
             if (loadingScreen) {
@@ -625,6 +404,422 @@ document.querySelector('.switch-to-signin')?.addEventListener('click', (e) => {
                 }, 500);
             }
         }, 3000);
+
+        // Main application initialization
+        async function initApp() {
+            try {
+                // Initialize Clerk
+                await initClerk();
+                
+                // Initialize navigation
+                initNavigation();
+                
+                // Initialize smooth scrolling
+                initSmoothScrolling();
+                
+                console.log('HealthAI application initialized successfully');
+            } catch (error) {
+                console.error('Failed to initialize application:', error);
+                showToast('Application initialization failed. Please refresh the page.', 'error');
+            }
+        }
+
+        // Clerk initialization
+        async function initClerk() {
+            // IMPORTANT: Replace this with your actual Clerk publishable key
+            // You can find it in your Clerk dashboard: https://dashboard.clerk.com
+            const CLERK_PUBLISHABLE_KEY = 'pk_test_your-actual-key-here';
+            
+            if (!CLERK_PUBLISHABLE_KEY || CLERK_PUBLISHABLE_KEY.includes('your-actual-key')) {
+                console.warn('Clerk publishable key not configured. Using demo mode.');
+                initDemoAuth();
+                return;
+            }
+
+            try {
+                // Initialize Clerk
+                window.clerk = await window.Clerk.load({
+                    publishableKey: CLERK_PUBLISHABLE_KEY,
+                    options: {
+                        appearance: {
+                            variables: {
+                                colorPrimary: '#6C63FF',
+                                colorText: '#333333',
+                                colorBackground: '#ffffff',
+                                fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+                            }
+                        },
+                        signIn: {
+                            afterSignInUrl: '/dashboard.html',
+                            redirectUrl: '/dashboard.html'
+                        },
+                        signUp: {
+                            afterSignUpUrl: '/dashboard.html',
+                            redirectUrl: '/dashboard.html'
+                        }
+                    }
+                });
+
+                // Update UI based on auth state
+                updateAuthUI();
+                
+                // Listen for auth changes
+                window.clerk.addListener(({ user }) => {
+                    updateAuthUI();
+                    
+                    if (user) {
+                        console.log('User signed in:', user.fullName || user.emailAddresses[0]?.emailAddress);
+                        showToast(`Welcome ${user.firstName || 'back'}!`, 'success');
+                    } else {
+                        console.log('User signed out');
+                        showToast('You have been signed out', 'info');
+                    }
+                });
+
+                // Setup event listeners
+                setupAuthEventListeners();
+                
+                console.log('Clerk initialized successfully');
+                
+            } catch (error) {
+                console.error('Failed to initialize Clerk:', error);
+                showToast('Authentication service is temporarily unavailable. Using demo mode.', 'error');
+                initDemoAuth();
+            }
+        }
+
+        // Update authentication UI
+        function updateAuthUI() {
+            const authButtons = document.getElementById('authButtons');
+            const userMenu = document.getElementById('userMenu');
+            const userAvatar = document.getElementById('userAvatar');
+            const userName = document.getElementById('userName');
+            const userEmail = document.getElementById('userEmail');
+            const userDropdown = document.getElementById('userDropdown');
+
+            // Check if Clerk is available and user is authenticated
+            if (window.clerk && window.clerk.user) {
+                // User is signed in
+                authButtons.style.display = 'none';
+                userMenu.style.display = 'block';
+                
+                const user = window.clerk.user;
+                const fullName = [user.firstName, user.lastName].filter(Boolean).join(' ');
+                const email = user.emailAddresses[0]?.emailAddress || user.primaryEmailAddress?.emailAddress || '';
+                
+                if (userName) {
+                    userName.textContent = fullName || 'User';
+                }
+                
+                if (userEmail) {
+                    userEmail.textContent = email;
+                }
+                
+                if (userAvatar) {
+                    // Create initials for avatar
+                    let initials = '';
+                    if (user.firstName) initials += user.firstName.charAt(0);
+                    if (user.lastName) initials += user.lastName.charAt(0);
+                    initials = initials.toUpperCase() || 'U';
+                    
+                    userAvatar.textContent = initials;
+                    userAvatar.setAttribute('aria-label', `${fullName || 'User'} menu`);
+                }
+                
+                // Protect pages that require authentication
+                protectAuthenticatedPages();
+                
+            } else {
+                // User is signed out
+                authButtons.style.display = 'flex';
+                userMenu.style.display = 'none';
+                
+                if (userDropdown) {
+                    userDropdown.classList.remove('active');
+                    userAvatar?.setAttribute('aria-expanded', 'false');
+                }
+                
+                // Redirect from protected pages
+                redirectFromProtectedPages();
+            }
+        }
+
+        // Setup authentication event listeners
+        function setupAuthEventListeners() {
+            const loginBtn = document.getElementById('loginBtn');
+            const signupBtn = document.getElementById('signupBtn');
+            const logoutBtn = document.getElementById('logoutBtn');
+            const userAvatar = document.getElementById('userAvatar');
+            const userDropdown = document.getElementById('userDropdown');
+
+            // Login button
+            if (loginBtn) {
+                loginBtn.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    try {
+                        await window.clerk.openSignIn();
+                    } catch (error) {
+                        console.error('Sign in error:', error);
+                        showToast('Failed to open sign in. Please try again.', 'error');
+                    }
+                });
+            }
+
+            // Signup button
+            if (signupBtn) {
+                signupBtn.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    try {
+                        await window.clerk.openSignUp();
+                    } catch (error) {
+                        console.error('Sign up error:', error);
+                        showToast('Failed to open sign up. Please try again.', 'error');
+                    }
+                });
+            }
+
+            // Logout button
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    try {
+                        await window.clerk.signOut();
+                        window.location.href = 'index.html';
+                    } catch (error) {
+                        console.error('Sign out error:', error);
+                        showToast('Failed to sign out. Please try again.', 'error');
+                    }
+                });
+            }
+
+            // User avatar dropdown
+            if (userAvatar && userDropdown) {
+                userAvatar.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const isExpanded = userDropdown.classList.toggle('active');
+                    userAvatar.setAttribute('aria-expanded', isExpanded.toString());
+                    
+                    // Focus first item when dropdown opens
+                    if (isExpanded) {
+                        setTimeout(() => {
+                            const firstMenuItem = userDropdown.querySelector('a[role="menuitem"]');
+                            if (firstMenuItem) firstMenuItem.focus();
+                        }, 100);
+                    }
+                });
+
+                // Close dropdown when clicking outside
+                document.addEventListener('click', (e) => {
+                    if (userDropdown && !userDropdown.contains(e.target) && !userAvatar.contains(e.target)) {
+                        userDropdown.classList.remove('active');
+                        userAvatar.setAttribute('aria-expanded', 'false');
+                    }
+                });
+
+                // Close dropdown on Escape key
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape' && userDropdown.classList.contains('active')) {
+                        userDropdown.classList.remove('active');
+                        userAvatar.setAttribute('aria-expanded', 'false');
+                        userAvatar.focus();
+                    }
+                });
+            }
+
+            // Handle protected links
+            document.querySelectorAll('a[href="dashboard.html"], a[href="progress.html"], a[href="profile.html"]').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    if (!window.clerk || !window.clerk.user) {
+                        e.preventDefault();
+                        showToast('Please sign in to access this page', 'info');
+                        setTimeout(() => {
+                            window.clerk?.openSignIn({
+                                afterSignInUrl: link.getAttribute('href'),
+                                redirectUrl: link.getAttribute('href')
+                            });
+                        }, 1000);
+                    }
+                });
+            });
+        }
+
+        // Protect pages that require authentication
+        function protectAuthenticatedPages() {
+            const protectedPages = ['dashboard.html', 'profile.html', 'progress.html', 'settings.html'];
+            const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+            
+            if (protectedPages.includes(currentPage) && (!window.clerk || !window.clerk.user)) {
+                showToast('Please sign in to access this page', 'info');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1500);
+            }
+        }
+
+        // Redirect from protected pages when not authenticated
+        function redirectFromProtectedPages() {
+            const protectedPages = ['dashboard.html', 'profile.html', 'progress.html', 'settings.html'];
+            const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+            
+            if (protectedPages.includes(currentPage)) {
+                showToast('Please sign in to continue', 'info');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 500);
+            }
+        }
+
+        // Demo authentication for testing (remove in production)
+        function initDemoAuth() {
+            console.log('Initializing demo authentication');
+            
+            const authButtons = document.getElementById('authButtons');
+            const userMenu = document.getElementById('userMenu');
+            const loginBtn = document.getElementById('loginBtn');
+            const signupBtn = document.getElementById('signupBtn');
+            const logoutBtn = document.getElementById('logoutBtn');
+            
+            // Check for demo user in localStorage
+            const demoUser = localStorage.getItem('healthai_demo_user');
+            
+            if (demoUser) {
+                // Demo user is "signed in"
+                authButtons.style.display = 'none';
+                userMenu.style.display = 'block';
+                
+                const user = JSON.parse(demoUser);
+                document.getElementById('userName').textContent = user.name;
+                document.getElementById('userEmail').textContent = user.email;
+                document.getElementById('userAvatar').textContent = user.name.charAt(0).toUpperCase();
+                
+                // Setup logout
+                if (logoutBtn) {
+                    logoutBtn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        localStorage.removeItem('healthai_demo_user');
+                        showToast('Signed out successfully', 'success');
+                        setTimeout(() => location.reload(), 1000);
+                    });
+                }
+            } else {
+                // Setup demo login/signup
+                if (loginBtn) {
+                    loginBtn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const demoUser = {
+                            name: 'Demo User',
+                            email: 'demo@healthai.com'
+                        };
+                        localStorage.setItem('healthai_demo_user', JSON.stringify(demoUser));
+                        showToast('Demo login successful!', 'success');
+                        setTimeout(() => location.reload(), 1000);
+                    });
+                }
+                
+                if (signupBtn) {
+                    signupBtn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const demoUser = {
+                            name: 'New User',
+                            email: 'newuser@healthai.com'
+                        };
+                        localStorage.setItem('healthai_demo_user', JSON.stringify(demoUser));
+                        showToast('Demo account created!', 'success');
+                        setTimeout(() => location.reload(), 1000);
+                    });
+                }
+            }
+            
+            // Setup user dropdown for demo
+            const userAvatar = document.getElementById('userAvatar');
+            const userDropdown = document.getElementById('userDropdown');
+            
+            if (userAvatar && userDropdown) {
+                userAvatar.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const isExpanded = userDropdown.classList.toggle('active');
+                    userAvatar.setAttribute('aria-expanded', isExpanded.toString());
+                });
+                
+                document.addEventListener('click', (e) => {
+                    if (!userDropdown.contains(e.target) && !userAvatar.contains(e.target)) {
+                        userDropdown.classList.remove('active');
+                        userAvatar.setAttribute('aria-expanded', 'false');
+                    }
+                });
+            }
+        }
+
+        // Initialize navigation active state
+        function initNavigation() {
+            const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+            const navLinks = document.querySelectorAll('.nav-links a');
+            
+            navLinks.forEach(link => {
+                const linkHref = link.getAttribute('href');
+                if (linkHref === currentPage || 
+                    (currentPage === '' && linkHref === 'index.html')) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+        }
+
+        // Initialize smooth scrolling
+        function initSmoothScrolling() {
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    if (targetId === '#') return;
+
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        window.scrollTo({
+                            top: targetElement.offsetTop - 100,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+        }
+
+        // Toast notification function
+        function showToast(message, type = 'info') {
+            // Remove existing toasts
+            document.querySelectorAll('.toast-message').forEach(toast => {
+                toast.style.animation = 'slideIn 0.3s ease reverse';
+                setTimeout(() => toast.remove(), 300);
+            });
+
+            const toast = document.createElement('div');
+            toast.className = `toast-message toast-${type}`;
+            toast.setAttribute('role', 'alert');
+            toast.setAttribute('aria-live', 'polite');
+            toast.setAttribute('aria-atomic', 'true');
+            
+            toast.innerHTML = `
+                <span>${message}</span>
+                <button onclick="this.parentElement.remove()" aria-label="Close notification">
+                    &times;
+                </button>
+            `;
+
+            document.body.appendChild(toast);
+
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                if (toast.parentElement) {
+                    toast.style.animation = 'slideIn 0.3s ease reverse';
+                    setTimeout(() => toast.remove(), 300);
+                }
+            }, 5000);
+            
+            return toast;
+        }
     </script>
+    <!-- In index.html, dashboard.html, profile.html, etc. -->
+<script src="js/auth-system.js"></script>
 </body>
 </html>

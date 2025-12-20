@@ -1,723 +1,741 @@
-// HealthAI Authentication System - Production Ready with Enhanced Profiling
-class HealthAIAuth {
-    constructor() {
-        this.storage = this.initStorage();
-        this.currentUser = null;
-        this.init();
-    }
-
-    initStorage() {
-        return {
-            get: (key) => {
-                try {
-                    if (typeof localStorage !== 'undefined') {
-                        const item = localStorage.getItem(key);
-                        return item ? JSON.parse(item) : null;
-                    }
-                    return null;
-                } catch (error) {
-                    console.warn('LocalStorage not available:', error);
-                    return this.getSessionFallback(key);
+// js/auth.js - ENHANCED SINGLE auth file for ALL pages
+(function() {
+    'use strict';
+    
+    // Configuration
+    const AUTH_CONFIG = {
+        publishableKey: 'pk_test_bWFnbmV0aWMtbXVkZnIzaC0xLmNsZXJrLmFjY291bnRzLmRldiQ',
+        protectedPages: ['dashboard.html', 'profile.html', 'progress.html', 'settings.html', 'chat.html'],
+        publicPages: ['index.html', 'workouts.html', 'nutrition.html', 'about.html', 'contact.html'],
+        authPages: ['auth.html'],
+        redirectAfterLogin: 'dashboard.html',
+        redirectAfterLogout: 'index.html',
+        authPageUrl: 'auth.html',
+        appName: 'HealthAI',
+        appLogo: '💪'
+    };
+    
+    // State management
+    let clerk = null;
+    let isInitialized = false;
+    let isInitializing = false;
+    let authListeners = [];
+    
+    // NEW: Toast notification system
+    function showToast(message, type = 'info', duration = 5000) {
+        // Remove existing toasts
+        document.querySelectorAll('.healthai-toast').forEach(toast => {
+            toast.remove();
+        });
+        
+        const toast = document.createElement('div');
+        toast.className = `healthai-toast toast-${type}`;
+        toast.innerHTML = `
+            <div class="toast-content">
+                <span>${message}</span>
+                <button class="toast-close">&times;</button>
+            </div>
+        `;
+        
+        // Add inline styles
+        toast.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: ${type === 'success' ? '#10B981' : type === 'error' ? '#EF4444' : '#3B82F6'};
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 9999;
+            animation: toastSlideIn 0.3s ease;
+            min-width: 250px;
+            max-width: 350px;
+        `;
+        
+        const toastContent = toast.querySelector('.toast-content');
+        toastContent.style.cssText = `
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+        `;
+        
+        const closeBtn = toast.querySelector('.toast-close');
+        closeBtn.style.cssText = `
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 0;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background 0.2s;
+        `;
+        
+        closeBtn.addEventListener('mouseover', () => {
+            closeBtn.style.background = 'rgba(255,255,255,0.2)';
+        });
+        
+        closeBtn.addEventListener('mouseout', () => {
+            closeBtn.style.background = 'none';
+        });
+        
+        closeBtn.addEventListener('click', () => {
+            toast.style.animation = 'toastSlideOut 0.3s ease forwards';
+            setTimeout(() => toast.remove(), 300);
+        });
+        
+        // Add CSS animations if not present
+        if (!document.querySelector('#toast-styles')) {
+            const style = document.createElement('style');
+            style.id = 'toast-styles';
+            style.textContent = `
+                @keyframes toastSlideIn {
+                    from { transform: translateX(100%); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
                 }
-            },
-            set: (key, value) => {
-                try {
-                    if (typeof localStorage !== 'undefined') {
-                        localStorage.setItem(key, JSON.stringify(value));
-                        return true;
-                    }
-                    return this.setSessionFallback(key, value);
-                } catch (error) {
-                    console.warn('LocalStorage not available:', error);
-                    return this.setSessionFallback(key, value);
+                @keyframes toastSlideOut {
+                    from { transform: translateX(0); opacity: 1; }
+                    to { transform: translateX(100%); opacity: 0; }
                 }
-            },
-            remove: (key) => {
-                try {
-                    if (typeof localStorage !== 'undefined') {
-                        localStorage.removeItem(key);
-                    }
-                    this.removeSessionFallback(key);
-                    return true;
-                } catch (error) {
-                    console.warn('Storage removal failed:', error);
-                    return false;
-                }
+            `;
+            document.head.appendChild(style);
+        }
+        
+        document.body.appendChild(toast);
+        
+        // Auto remove
+        setTimeout(() => {
+            if (toast.parentElement) {
+                toast.style.animation = 'toastSlideOut 0.3s ease forwards';
+                setTimeout(() => toast.remove(), 300);
             }
+        }, duration);
+        
+        return toast;
+    }
+    
+    // NEW: Add auth event listener
+    function addAuthListener(callback) {
+        authListeners.push(callback);
+        return () => {
+            authListeners = authListeners.filter(cb => cb !== callback);
         };
     }
-
-    getSessionFallback(key) {
+    
+    // NEW: Notify all listeners
+    function notifyAuthListeners(user) {
+        authListeners.forEach(callback => {
+            try {
+                callback(user);
+            } catch (error) {
+                console.error('Auth listener error:', error);
+            }
+        });
+    }
+    
+    // NEW: Get user session token
+    async function getSessionToken() {
+        if (!clerk || !clerk.session) return null;
+        
         try {
-            const item = sessionStorage.getItem(key);
-            return item ? JSON.parse(item) : null;
+            return await clerk.session.getToken();
         } catch (error) {
+            console.error('Failed to get session token:', error);
             return null;
         }
     }
-
-    setSessionFallback(key, value) {
+    
+    // Initialize auth
+    async function initAuth() {
+        if (isInitialized || isInitializing) return;
+        
+        isInitializing = true;
+        
         try {
-            sessionStorage.setItem(key, JSON.stringify(value));
-            return true;
+            console.log('🔐 Initializing auth system...');
+            showToast('Loading authentication...', 'info', 2000);
+            
+            // Load Clerk SDK if not loaded
+            if (!window.Clerk) {
+                console.log('📦 Loading Clerk SDK...');
+                await loadClerkSDK();
+            }
+            
+            console.log('✅ Clerk SDK loaded, initializing...');
+            
+            // Initialize Clerk with enhanced options
+            clerk = await window.Clerk.load({
+                publishableKey: AUTH_CONFIG.publishableKey,
+                options: {
+                    appearance: {
+                        variables: {
+                            colorPrimary: '#6C63FF',
+                            colorText: '#333333',
+                            colorBackground: '#ffffff',
+                            colorInputBackground: '#f8f9fa',
+                            fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+                        }
+                    }
+                }
+            });
+            
+            isInitialized = true;
+            isInitializing = false;
+            console.log('✅ Auth system initialized');
+            
+            // Update UI
+            updateAuthUI();
+            
+            // Setup event listeners
+            setupAuthEvents();
+            
+            // Protect current page
+            protectCurrentPage();
+            
+            // Listen for auth changes
+            clerk.addListener(handleAuthChange);
+            
+            // NEW: Load user preferences
+            loadUserPreferences();
+            
+            showToast('Authentication ready!', 'success', 2000);
+            
         } catch (error) {
-            console.warn('Session storage also failed:', error);
+            console.error('❌ Auth initialization failed:', error);
+            isInitializing = false;
+            showToast('Authentication service unavailable', 'error', 5000);
+            showFallbackUI();
+        }
+    }
+    
+    // NEW: Load user preferences
+    function loadUserPreferences() {
+        if (!clerk?.user) return;
+        
+        try {
+            // Load user preferences from localStorage
+            const prefs = localStorage.getItem(`healthai_prefs_${clerk.user.id}`);
+            if (prefs) {
+                console.log('Loaded user preferences:', JSON.parse(prefs));
+            }
+            
+            // Set user theme preference
+            const theme = localStorage.getItem('healthai_theme') || 'light';
+            document.documentElement.setAttribute('data-theme', theme);
+            
+        } catch (error) {
+            console.error('Failed to load user preferences:', error);
+        }
+    }
+    
+    // Load Clerk SDK
+    async function loadClerkSDK() {
+        return new Promise((resolve, reject) => {
+            if (window.Clerk) {
+                resolve();
+                return;
+            }
+            
+            // Check if already loading
+            if (document.querySelector('script[src*="clerk-js"]')) {
+                // Wait for existing script to load
+                const checkInterval = setInterval(() => {
+                    if (window.Clerk) {
+                        clearInterval(checkInterval);
+                        resolve();
+                    }
+                }, 100);
+                return;
+            }
+            
+            const script = document.createElement('script');
+            script.src = 'https://cdn.jsdelivr.net/npm/@clerk/clerk-js@latest/dist/clerk.browser.js';
+            script.async = true;
+            
+            script.onload = resolve;
+            script.onerror = reject;
+            
+            document.head.appendChild(script);
+        });
+    }
+    
+    // Update auth UI
+    function updateAuthUI() {
+        if (!clerk) return;
+        
+        const authButtons = document.getElementById('authButtons');
+        const userMenu = document.getElementById('userMenu');
+        const userName = document.getElementById('userName');
+        const userEmail = document.getElementById('userEmail');
+        const userAvatar = document.getElementById('userAvatar');
+        const userInitials = document.getElementById('userInitials');
+        
+        if (!authButtons || !userMenu) {
+            console.log('⚠️ Auth UI elements not found on this page');
+            return;
+        }
+        
+        if (clerk.user) {
+            // User is logged in
+            authButtons.style.display = 'none';
+            userMenu.style.display = 'block';
+            
+            const user = clerk.user;
+            const firstName = user.firstName || '';
+            const lastName = user.lastName || '';
+            const fullName = firstName + (lastName ? ' ' + lastName : '');
+            const email = user.primaryEmailAddress?.emailAddress || 
+                         user.emailAddresses[0]?.emailAddress || '';
+            
+            if (userName) userName.textContent = fullName || 'User';
+            if (userEmail) userEmail.textContent = email;
+            
+            // Generate initials
+            const initials = (firstName.charAt(0) + (lastName.charAt(0) || '')).toUpperCase() || 'U';
+            
+            if (userAvatar) {
+                userAvatar.textContent = initials;
+                // Add random background color
+                const colors = ['#6C63FF', '#4A47B9', '#10B981', '#F59E0B', '#EF4444', '#3B82F6'];
+                const randomColor = colors[Math.floor(Math.random() * colors.length)];
+                userAvatar.style.backgroundColor = randomColor;
+            }
+            
+            if (userInitials) {
+                userInitials.textContent = initials;
+            }
+            
+            console.log('✅ User is logged in:', fullName);
+            
+            // NEW: Update page title with user info
+            updatePageTitle(fullName);
+            
+        } else {
+            // User is logged out
+            authButtons.style.display = 'flex';
+            userMenu.style.display = 'none';
+            console.log('👤 User is logged out');
+            
+            // Reset page title
+            updatePageTitle();
+        }
+    }
+    
+    // NEW: Update page title with user info
+    function updatePageTitle(userName = '') {
+        const currentPage = getCurrentPage();
+        const pageTitles = {
+            'index.html': 'HealthAI - Home',
+            'dashboard.html': `Dashboard${userName ? ` - ${userName}` : ''}`,
+            'profile.html': `Profile${userName ? ` - ${userName}` : ''}`,
+            'progress.html': 'Progress',
+            'settings.html': 'Settings',
+            'chat.html': 'AI Assistant',
+            'workouts.html': 'Workouts',
+            'nutrition.html': 'Nutrition'
+        };
+        
+        document.title = pageTitles[currentPage] || 'HealthAI';
+    }
+    
+    // Handle auth changes
+    function handleAuthChange({ user }) {
+        console.log('🔄 Auth state changed:', user ? 'User signed in' : 'User signed out');
+        
+        updateAuthUI();
+        notifyAuthListeners(user);
+        
+        const currentPage = getCurrentPage();
+        
+        if (user) {
+            // User signed in
+            const userName = user.firstName || user.emailAddresses[0]?.emailAddress;
+            console.log('✅ User signed in:', userName);
+            showToast(`Welcome ${user.firstName ? `back, ${user.firstName}!` : 'back!'}`, 'success', 3000);
+            
+            // Redirect from auth pages
+            if (AUTH_CONFIG.authPages.includes(currentPage)) {
+                const redirect = getRedirectFromStorage() || AUTH_CONFIG.redirectAfterLogin;
+                console.log(`🔀 Redirecting from auth page to: ${redirect}`);
+                
+                setTimeout(() => {
+                    window.location.href = redirect;
+                }, 1500);
+            }
+            
+            // NEW: Track login event
+            trackAuthEvent('login_success', { userId: user.id });
+            
+        } else {
+            // User signed out
+            console.log('👤 User signed out');
+            showToast('Signed out successfully', 'info', 3000);
+            
+            // Redirect from protected pages
+            if (AUTH_CONFIG.protectedPages.includes(currentPage)) {
+                console.log(`🔀 Redirecting from protected page to: ${AUTH_CONFIG.redirectAfterLogout}`);
+                
+                setTimeout(() => {
+                    window.location.href = AUTH_CONFIG.redirectAfterLogout;
+                }, 1000);
+            }
+            
+            // NEW: Track logout event
+            trackAuthEvent('logout');
+        }
+    }
+    
+    // NEW: Track auth events
+    function trackAuthEvent(eventName, data = {}) {
+        const eventData = {
+            event: eventName,
+            timestamp: new Date().toISOString(),
+            page: getCurrentPage(),
+            ...data
+        };
+        
+        console.log('📊 Auth event:', eventData);
+        
+        // In a real app, send to analytics service
+        // Example: sendToAnalytics('auth_event', eventData);
+    }
+    
+    // Setup event listeners
+    function setupAuthEvents() {
+        // Login button
+        const loginBtn = document.getElementById('loginBtn');
+        if (loginBtn) {
+            // Remove existing listeners
+            const newLoginBtn = loginBtn.cloneNode(true);
+            loginBtn.parentNode.replaceChild(newLoginBtn, loginBtn);
+            
+            newLoginBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('🖱️ Login button clicked');
+                trackAuthEvent('login_click');
+                redirectToAuth('login');
+            });
+        }
+        
+        // Signup button
+        const signupBtn = document.getElementById('signupBtn');
+        if (signupBtn) {
+            // Remove existing listeners
+            const newSignupBtn = signupBtn.cloneNode(true);
+            signupBtn.parentNode.replaceChild(newSignupBtn, signupBtn);
+            
+            newSignupBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('🖱️ Signup button clicked');
+                trackAuthEvent('signup_click');
+                redirectToAuth('signup');
+            });
+        }
+        
+        // Logout button
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (!clerk) return;
+                
+                try {
+                    console.log('🖱️ Logout button clicked');
+                    trackAuthEvent('logout_click');
+                    await clerk.signOut();
+                } catch (error) {
+                    console.error('❌ Logout failed:', error);
+                    showToast('Logout failed. Please try again.', 'error', 3000);
+                }
+            });
+        }
+        
+        // User dropdown
+        const userAvatar = document.getElementById('userAvatar');
+        const userDropdown = document.getElementById('userDropdown');
+        
+        if (userAvatar && userDropdown) {
+            userAvatar.addEventListener('click', (e) => {
+                e.stopPropagation();
+                userDropdown.classList.toggle('active');
+                
+                // Close other dropdowns
+                document.querySelectorAll('.user-dropdown.active').forEach(dropdown => {
+                    if (dropdown !== userDropdown) {
+                        dropdown.classList.remove('active');
+                    }
+                });
+            });
+            
+            document.addEventListener('click', (e) => {
+                if (!userDropdown.contains(e.target) && !userAvatar.contains(e.target)) {
+                    userDropdown.classList.remove('active');
+                }
+            });
+            
+            // Close on Escape key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && userDropdown.classList.contains('active')) {
+                    userDropdown.classList.remove('active');
+                    userAvatar.focus();
+                }
+            });
+        }
+        
+        // Protect links to protected pages
+        document.addEventListener('click', function(e) {
+            const link = e.target.closest('a');
+            if (!link) return;
+            
+            const href = link.getAttribute('href');
+            if (!href) return;
+            
+            const pageName = href.split('/').pop() || href;
+            
+            // Check if it's a protected page
+            if (AUTH_CONFIG.protectedPages.includes(pageName)) {
+                // If user is not logged in, intercept
+                if (!clerk?.user) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    console.log(`🔒 Protecting link to: ${href}`);
+                    trackAuthEvent('protected_link_click', { page: pageName });
+                    
+                    // Store redirect URL
+                    saveRedirectToStorage(href);
+                    
+                    // Show message first
+                    showToast('Please sign in to continue', 'info', 2000);
+                    
+                    // Then redirect to auth page
+                    setTimeout(() => {
+                        redirectToAuth('login', href);
+                    }, 1000);
+                }
+            }
+        }, true);
+        
+        // NEW: Add keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            // Ctrl+Shift+L for login (development only)
+            if (e.ctrlKey && e.shiftKey && e.key === 'L') {
+                e.preventDefault();
+                redirectToAuth('login');
+            }
+            
+            // Ctrl+Shift+K for signup (development only)
+            if (e.ctrlKey && e.shiftKey && e.key === 'K') {
+                e.preventDefault();
+                redirectToAuth('signup');
+            }
+        });
+    }
+    
+    // Protect current page
+    function protectCurrentPage() {
+        if (!clerk) return;
+        
+        const currentPage = getCurrentPage();
+        
+        // Check if current page is protected
+        if (AUTH_CONFIG.protectedPages.includes(currentPage)) {
+            if (!clerk.user) {
+                console.log(`🚫 Protected page accessed without auth: ${currentPage}`);
+                trackAuthEvent('protected_page_access', { page: currentPage, unauthorized: true });
+                
+                // Store current page for redirect after login
+                saveRedirectToStorage(currentPage);
+                
+                // Show message first
+                showToast('Authentication required', 'info', 2000);
+                
+                // Then redirect to auth page
+                setTimeout(() => {
+                    redirectToAuth('login', currentPage);
+                }, 1500);
+            } else {
+                trackAuthEvent('protected_page_access', { page: currentPage, authorized: true });
+            }
+        }
+        
+        // If on auth page and already logged in, redirect
+        if (AUTH_CONFIG.authPages.includes(currentPage)) {
+            if (clerk.user) {
+                console.log(`✅ Already logged in, redirecting from auth page`);
+                
+                const redirect = getRedirectFromStorage() || AUTH_CONFIG.redirectAfterLogin;
+                
+                showToast('Already signed in! Redirecting...', 'success', 2000);
+                
+                setTimeout(() => {
+                    window.location.href = redirect;
+                }, 2000);
+            }
+        }
+    }
+    
+    // Redirect to auth page
+    function redirectToAuth(action = 'login', redirectTo = null) {
+        const currentPage = getCurrentPage();
+        const redirect = redirectTo || currentPage;
+        
+        let url = `${AUTH_CONFIG.authPageUrl}?action=${action}`;
+        
+        if (redirect && !AUTH_CONFIG.authPages.includes(redirect)) {
+            url += `&redirect=${encodeURIComponent(redirect)}`;
+        }
+        
+        console.log(`🔗 Redirecting to auth page: ${url}`);
+        
+        // Add timestamp to prevent caching issues
+        url += `&_t=${Date.now()}`;
+        
+        window.location.href = url;
+    }
+    
+    // Save redirect URL to storage
+    function saveRedirectToStorage(url) {
+        sessionStorage.setItem('healthai_redirect', url);
+        localStorage.setItem('healthai_last_redirect', url);
+    }
+    
+    // Get redirect URL from storage
+    function getRedirectFromStorage() {
+        return sessionStorage.getItem('healthai_redirect') || 
+               localStorage.getItem('healthai_last_redirect');
+    }
+    
+    // Clear redirect storage
+    function clearRedirectStorage() {
+        sessionStorage.removeItem('healthai_redirect');
+        localStorage.removeItem('healthai_last_redirect');
+    }
+    
+    // Get current page
+    function getCurrentPage() {
+        const path = window.location.pathname;
+        const page = path.split('/').pop() || 'index.html';
+        
+        // Handle hash URLs
+        if (page.includes('#')) {
+            return page.split('#')[0];
+        }
+        
+        return page;
+    }
+    
+    // Show fallback UI
+    function showFallbackUI() {
+        const authButtons = document.getElementById('authButtons');
+        const userMenu = document.getElementById('userMenu');
+        
+        if (authButtons) {
+            authButtons.style.display = 'flex';
+            
+            // Add offline mode indicators
+            const loginBtn = document.getElementById('loginBtn');
+            const signupBtn = document.getElementById('signupBtn');
+            
+            if (loginBtn) {
+                loginBtn.innerHTML = '<i class="fas fa-wifi-slash"></i> Offline Login';
+                loginBtn.title = 'Authentication service is offline';
+                loginBtn.style.opacity = '0.7';
+            }
+            
+            if (signupBtn) {
+                signupBtn.innerHTML = '<i class="fas fa-wifi-slash"></i> Offline Signup';
+                signupBtn.title = 'Authentication service is offline';
+                signupBtn.style.opacity = '0.7';
+            }
+        }
+        
+        if (userMenu) {
+            userMenu.style.display = 'none';
+        }
+        
+        console.log('⚠️ Showing fallback auth UI');
+        
+        // Show offline message
+        showToast('Working in offline mode. Some features may be limited.', 'warning', 5000);
+    }
+    
+    // NEW: Check auth status periodically
+    function startAuthHealthCheck() {
+        setInterval(async () => {
+            if (clerk && clerk.user) {
+                try {
+                    // Try to refresh session
+                    await clerk.session?.touch();
+                } catch (error) {
+                    console.warn('Session health check failed:', error);
+                }
+            }
+        }, 5 * 60 * 1000); // Every 5 minutes
+    }
+    
+    // Initialize when DOM is ready
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('📄 DOM loaded, initializing auth...');
+        
+        // Check if we're on an auth page (don't auto-init there)
+        const currentPage = getCurrentPage();
+        
+        if (AUTH_CONFIG.authPages.includes(currentPage)) {
+            console.log('🔐 On auth page, delaying auth init...');
+            // Auth page has its own initialization
+        } else {
+            // Start auth initialization for regular pages
+            setTimeout(() => {
+                initAuth();
+                startAuthHealthCheck();
+            }, 100);
+        }
+        
+        // NEW: Handle page visibility changes
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden && clerk) {
+                // Page became visible, refresh auth state
+                updateAuthUI();
+            }
+        });
+    });
+    
+    // Make functions globally available
+    window.getCurrentUser = () => clerk?.user || null;
+    window.isUserAuthenticated = () => !!clerk?.user;
+    window.getSessionToken = getSessionToken;
+    window.showAuthToast = showToast;
+    window.addAuthListener = addAuthListener;
+    window.clearAuthRedirect = clearRedirectStorage;
+    
+    window.healthaiAuth = {
+        init: initAuth,
+        user: () => clerk?.user,
+        signOut: () => clerk?.signOut(),
+        redirectToAuth: redirectToAuth,
+        getToken: getSessionToken,
+        isInitialized: () => isInitialized,
+        getConfig: () => ({ ...AUTH_CONFIG }),
+        refresh: () => {
+            if (clerk) {
+                updateAuthUI();
+                return true;
+            }
             return false;
         }
-    }
-
-    removeSessionFallback(key) {
-        try {
-            sessionStorage.removeItem(key);
-        } catch (error) {
-            // Ignore errors during removal
-        }
-    }
-
-    init() {
-        document.addEventListener('DOMContentLoaded', () => {
-            this.setupEventListeners();
-            this.checkAuthState();
-            this.setupPageProtection();
-        });
-    }
-
-    setupEventListeners() {
-        // Auth modal
-        const loginBtn = document.getElementById('loginBtn');
-        const signupBtn = document.getElementById('signupBtn');
-        const authModal = document.getElementById('authModal');
-        const closeAuth = document.getElementById('closeAuth');
-
-        if (loginBtn) loginBtn.addEventListener('click', () => this.openAuthModal('login'));
-        if (signupBtn) signupBtn.addEventListener('click', () => this.openAuthModal('signup'));
-        if (closeAuth) closeAuth.addEventListener('click', () => this.closeAuthModal());
-        if (authModal) authModal.addEventListener('click', (e) => {
-            if (e.target === authModal) this.closeAuthModal();
-        });
-
-        // Auth tabs
-        const loginTab = document.getElementById('loginTab');
-        const signupTab = document.getElementById('signupTab');
-
-        if (loginTab) loginTab.addEventListener('click', () => this.switchAuthTab('login'));
-        if (signupTab) signupTab.addEventListener('click', () => this.switchAuthTab('signup'));
-
-        // Auth forms
-        const loginForm = document.getElementById('loginForm');
-        const signupForm = document.getElementById('signupForm');
-
-        if (loginForm) loginForm.addEventListener('submit', (e) => this.handleLogin(e));
-        if (signupForm) signupForm.addEventListener('submit', (e) => this.handleSignup(e));
-
-        // User menu
-        const userAvatar = document.getElementById('userAvatar');
-        const logoutBtn = document.getElementById('logoutBtn');
-
-        if (userAvatar) userAvatar.addEventListener('click', (e) => this.toggleUserMenu(e));
-        if (logoutBtn) logoutBtn.addEventListener('click', (e) => this.handleLogout(e));
-
-        // Social login
-        document.querySelectorAll('.social-btn').forEach(btn => {
-            btn.addEventListener('click', () => this.handleSocialLogin());
-        });
-
-        // Close user menu when clicking outside
-        document.addEventListener('click', (e) => {
-            const userMenu = document.getElementById('userMenu');
-            const userDropdown = document.getElementById('userDropdown');
-            const userAvatar = document.getElementById('userAvatar');
-
-            if (userMenu && userDropdown && userAvatar && 
-                !userMenu.contains(e.target)) {
-                userDropdown.classList.remove('active');
-                userAvatar.setAttribute('aria-expanded', 'false');
-            }
-        });
-
-        // Escape key to close modals
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                this.closeAuthModal();
-                const userDropdown = document.getElementById('userDropdown');
-                if (userDropdown) {
-                    userDropdown.classList.remove('active');
-                    const userAvatar = document.getElementById('userAvatar');
-                    if (userAvatar) userAvatar.setAttribute('aria-expanded', 'false');
-                }
-            }
-        });
-    }
-
-    checkAuthState() {
-        this.currentUser = this.storage.get('healthai_current_user') || 
-                          this.storage.get('healthai_user');
-
-        if (this.currentUser) {
-            this.handleUserLoggedIn();
-        } else {
-            this.handleUserLoggedOut();
-        }
-    }
-
-    handleUserLoggedIn() {
-        // Update UI
-        const authButtons = document.getElementById('authButtons');
-        const userMenu = document.getElementById('userMenu');
-        const userAvatar = document.getElementById('userAvatar');
-        const userName = document.getElementById('userName');
-
-        if (authButtons) authButtons.style.display = 'none';
-        if (userMenu) userMenu.style.display = 'block';
-        if (userAvatar) {
-            userAvatar.textContent = this.currentUser.name.charAt(0).toUpperCase();
-            userAvatar.setAttribute('aria-label', `User menu for ${this.currentUser.name}`);
-        }
-        if (userName) userName.textContent = this.currentUser.name;
-
-        // Redirect logic
-        this.handleRedirects();
-    }
-
-    handleUserLoggedOut() {
-        const authButtons = document.getElementById('authButtons');
-        const userMenu = document.getElementById('userMenu');
-
-        if (authButtons) authButtons.style.display = 'flex';
-        if (userMenu) userMenu.style.display = 'none';
-
-        // Protect routes
-        this.protectRoutes();
-    }
-
-    handleRedirects() {
-        const currentPage = this.getCurrentPage();
-        const isHomePage = currentPage === 'index.html' || currentPage === '' || currentPage.endsWith('/');
-
-        if (isHomePage) {
-            setTimeout(() => {
-                window.location.href = 'dashboard.html';
-            }, 100);
-        }
-    }
-
-    protectRoutes() {
-        const currentPage = this.getCurrentPage();
-        const protectedPages = ['dashboard.html', 'progress.html'];
-
-        if (protectedPages.includes(currentPage)) {
-            window.location.href = 'index.html';
-        }
-    }
-
-    setupPageProtection() {
-        // Additional page protection logic
-        const currentPage = this.getCurrentPage();
-        const protectedPages = ['dashboard.html', 'progress.html'];
-
-        if (protectedPages.includes(currentPage) && !this.currentUser) {
-            window.location.href = 'index.html';
-        }
-    }
-
-    getCurrentPage() {
-        const path = window.location.pathname;
-        const page = path.split('/').pop();
-        return page || 'index.html';
-    }
-
-    openAuthModal(tab = 'login') {
-        const authModal = document.getElementById('authModal');
-        if (authModal) {
-            authModal.style.display = 'flex';
-            authModal.setAttribute('aria-hidden', 'false');
-            document.body.style.overflow = 'hidden';
-
-            if (tab === 'login') {
-                this.switchAuthTab('login');
-            } else {
-                this.switchAuthTab('signup');
-            }
-
-            // Focus management
-            setTimeout(() => {
-                const firstInput = authModal.querySelector('input');
-                if (firstInput) firstInput.focus();
-            }, 100);
-        }
-    }
-
-    closeAuthModal() {
-        const authModal = document.getElementById('authModal');
-        if (authModal) {
-            authModal.style.display = 'none';
-            authModal.setAttribute('aria-hidden', 'true');
-            document.body.style.overflow = '';
-
-            // Reset forms
-            const loginForm = document.getElementById('loginForm');
-            const signupForm = document.getElementById('signupForm');
-            if (loginForm) loginForm.reset();
-            if (signupForm) signupForm.reset();
-        }
-    }
-
-    switchAuthTab(tab) {
-        const loginTab = document.getElementById('loginTab');
-        const signupTab = document.getElementById('signupTab');
-        const loginForm = document.getElementById('loginForm');
-        const signupForm = document.getElementById('signupForm');
-
-        if (tab === 'login') {
-            if (loginTab) {
-                loginTab.classList.add('active');
-                loginTab.setAttribute('aria-selected', 'true');
-            }
-            if (signupTab) {
-                signupTab.classList.remove('active');
-                signupTab.setAttribute('aria-selected', 'false');
-            }
-            if (loginForm) {
-                loginForm.classList.add('active');
-                loginForm.removeAttribute('hidden');
-            }
-            if (signupForm) {
-                signupForm.classList.remove('active');
-                signupForm.setAttribute('hidden', 'true');
-            }
-        } else {
-            if (signupTab) {
-                signupTab.classList.add('active');
-                signupTab.setAttribute('aria-selected', 'true');
-            }
-            if (loginTab) {
-                loginTab.classList.remove('active');
-                loginTab.setAttribute('aria-selected', 'false');
-            }
-            if (signupForm) {
-                signupForm.classList.add('active');
-                signupForm.removeAttribute('hidden');
-            }
-            if (loginForm) {
-                loginForm.classList.remove('active');
-                loginForm.setAttribute('hidden', 'true');
-            }
-        }
-    }
-
-    async handleLogin(e) {
-        e.preventDefault();
-        
-        const email = document.getElementById('loginEmail')?.value.trim();
-        const password = document.getElementById('loginPassword')?.value;
-
-        if (!this.validateEmail(email)) {
-            this.showToast('Please enter a valid email address', 'error');
-            return;
-        }
-
-        if (!password || password.length < 1) {
-            this.showToast('Please enter your password', 'error');
-            return;
-        }
-
-        // Show loading state
-        const submitBtn = e.target.querySelector('button[type="submit"]');
-        const originalText = submitBtn.textContent;
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in...';
-        submitBtn.disabled = true;
-
-        try {
-            // Simulate API call
-            await this.simulateAPICall(1000);
-
-            let user = this.storage.get('healthai_current_user');
-            
-            // If user exists but profile is incomplete, show profiling
-            if (user && (!user.profile || !user.profile.fitnessLevel)) {
-                const userProfile = await this.showUserProfilingQuestions(user.name);
-                user.profile = userProfile;
-                user.preferences = {
-                    workoutLevel: userProfile.fitnessLevel,
-                    workoutType: userProfile.preferredWorkouts,
-                    diet: userProfile.dietaryPreference,
-                    equipment: userProfile.equipmentAvailable,
-                    timeAvailable: userProfile.workoutTime,
-                    notifications: true
-                };
-            }
-
-            if (!user) {
-                // Create new user with basic profile
-                user = {
-                    name: email.split('@')[0],
-                    email: email,
-                    joinDate: new Date().toISOString(),
-                    profile: await this.showUserProfilingQuestions(email.split('@')[0]),
-                    userId: this.generateUserId(),
-                    lastLogin: new Date().toISOString()
-                };
-            }
-
-            if (this.storage.set('healthai_current_user', user)) {
-                this.currentUser = user;
-                this.handleUserLoggedIn();
-                this.closeAuthModal();
-                this.showToast('Login successful! Welcome to HealthAI.', 'success');
-                
-                setTimeout(() => {
-                    window.location.href = 'dashboard.html';
-                }, 1500);
-            } else {
-                throw new Error('Storage failed');
-            }
-        } catch (error) {
-            this.showToast('Login failed. Please try again.', 'error');
-            console.error('Login error:', error);
-        } finally {
-            // Reset button
-            submitBtn.textContent = originalText;
-            submitBtn.disabled = false;
-        }
-    }
-
-    async handleSignup(e) {
-        e.preventDefault();
-        
-        const name = document.getElementById('signupName')?.value.trim();
-        const email = document.getElementById('signupEmail')?.value.trim();
-        const password = document.getElementById('signupPassword')?.value;
-        const confirmPassword = document.getElementById('signupConfirmPassword')?.value;
-
-        // Validation
-        if (!name || name.length < 2) {
-            this.showToast('Please enter your full name', 'error');
-            return;
-        }
-
-        if (!this.validateEmail(email)) {
-            this.showToast('Please enter a valid email address', 'error');
-            return;
-        }
-
-        if (!password || password.length < 6) {
-            this.showToast('Password must be at least 6 characters long', 'error');
-            return;
-        }
-
-        if (password !== confirmPassword) {
-            this.showToast('Passwords do not match', 'error');
-            return;
-        }
-
-        // Show loading state
-        const submitBtn = e.target.querySelector('button[type="submit"]');
-        const originalText = submitBtn.textContent;
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating account...';
-        submitBtn.disabled = true;
-
-        try {
-            // Show user profiling questions
-            const userProfile = await this.showUserProfilingQuestions(name);
-            
-            const user = {
-                name: name,
-                email: email,
-                joinDate: new Date().toISOString(),
-                profile: userProfile,
-                goals: {
-                    workout: userProfile.fitnessGoal,
-                    weight: userProfile.targetWeight,
-                    nutrition: 85
-                },
-                preferences: {
-                    workoutLevel: userProfile.fitnessLevel,
-                    workoutType: userProfile.preferredWorkouts,
-                    diet: userProfile.dietaryPreference,
-                    equipment: userProfile.equipmentAvailable,
-                    timeAvailable: userProfile.workoutTime,
-                    notifications: true
-                },
-                userId: this.generateUserId()
-            };
-
-            if (this.storage.set('healthai_current_user', user)) {
-                this.currentUser = user;
-                this.handleUserLoggedIn();
-                this.closeAuthModal();
-                this.showToast('Account created successfully! Welcome to HealthAI.', 'success');
-                
-                setTimeout(() => {
-                    window.location.href = 'dashboard.html';
-                }, 1500);
-            } else {
-                throw new Error('Storage failed');
-            }
-        } catch (error) {
-            this.showToast('Signup failed. Please try again.', 'error');
-            console.error('Signup error:', error);
-        } finally {
-            // Reset button
-            submitBtn.textContent = originalText;
-            submitBtn.disabled = false;
-        }
-    }
-
-    // New method for user profiling questions
-    async showUserProfilingQuestions(name) {
-        return new Promise((resolve) => {
-            // Create profiling modal
-            const profilingModal = document.createElement('div');
-            profilingModal.className = 'auth-modal';
-            profilingModal.style.display = 'flex';
-            profilingModal.innerHTML = `
-                <div class="auth-container" style="max-width: 600px;">
-                    <div class="auth-header">
-                        <h2>Tell Us About Yourself</h2>
-                        <p>Help us personalize your HealthAI experience, ${name}!</p>
-                        <button class="close-auth" id="closeProfiling">&times;</button>
-                    </div>
-                    <div class="profiling-content">
-                        <form id="profilingForm">
-                            <!-- Fitness Level -->
-                            <div class="form-group">
-                                <label for="fitnessLevel">What's your current fitness level?</label>
-                                <select id="fitnessLevel" required>
-                                    <option value="">Select your level</option>
-                                    <option value="beginner">Beginner - New to exercise</option>
-                                    <option value="intermediate">Intermediate - Some experience</option>
-                                    <option value="advanced">Advanced - Regular exerciser</option>
-                                </select>
-                            </div>
-
-                            <!-- Fitness Goal -->
-                            <div class="form-group">
-                                <label for="fitnessGoal">What's your primary fitness goal?</label>
-                                <select id="fitnessGoal" required>
-                                    <option value="">Select your goal</option>
-                                    <option value="weight_loss">Weight Loss</option>
-                                    <option value="muscle_gain">Muscle Building</option>
-                                    <option value="endurance">Improve Endurance</option>
-                                    <option value="strength">Get Stronger</option>
-                                    <option value="general_fitness">General Fitness</option>
-                                </select>
-                            </div>
-
-                            <!-- Preferred Workouts -->
-                            <div class="form-group">
-                                <label>What type of workouts do you prefer? (Select all that apply)</label>
-                                <div class="checkbox-group">
-                                    <label class="checkbox-label">
-                                        <input type="checkbox" name="workoutType" value="strength"> Strength Training
-                                    </label>
-                                    <label class="checkbox-label">
-                                        <input type="checkbox" name="workoutType" value="cardio"> Cardio
-                                    </label>
-                                    <label class="checkbox-label">
-                                        <input type="checkbox" name="workoutType" value="yoga"> Yoga & Flexibility
-                                    </label>
-                                    <label class="checkbox-label">
-                                        <input type="checkbox" name="workoutType" value="hiit"> HIIT
-                                    </label>
-                                    <label class="checkbox-label">
-                                        <input type="checkbox" name="workoutType" value="sports"> Sports
-                                    </label>
-                                </div>
-                            </div>
-
-                            <!-- Available Equipment -->
-                            <div class="form-group">
-                                <label>What equipment do you have access to?</label>
-                                <div class="checkbox-group">
-                                    <label class="checkbox-label">
-                                        <input type="checkbox" name="equipment" value="none" checked> Bodyweight Only
-                                    </label>
-                                    <label class="checkbox-label">
-                                        <input type="checkbox" name="equipment" value="dumbbells"> Dumbbells
-                                    </label>
-                                    <label class="checkbox-label">
-                                        <input type="checkbox" name="equipment" value="resistance_bands"> Resistance Bands
-                                    </label>
-                                    <label class="checkbox-label">
-                                        <input type="checkbox" name="equipment" value="yoga_mat"> Yoga Mat
-                                    </label>
-                                    <label class="checkbox-label">
-                                        <input type="checkbox" name="equipment" value="gym_access"> Gym Access
-                                    </label>
-                                </div>
-                            </div>
-
-                            <!-- Workout Time -->
-                            <div class="form-group">
-                                <label for="workoutTime">How much time can you dedicate to workouts?</label>
-                                <select id="workoutTime" required>
-                                    <option value="">Select time availability</option>
-                                    <option value="15-30">15-30 minutes</option>
-                                    <option value="30-45">30-45 minutes</option>
-                                    <option value="45-60">45-60 minutes</option>
-                                    <option value="60+">60+ minutes</option>
-                                </select>
-                            </div>
-
-                            <!-- Dietary Preference -->
-                            <div class="form-group">
-                                <label for="dietaryPreference">What's your dietary preference?</label>
-                                <select id="dietaryPreference" required>
-                                    <option value="">Select preference</option>
-                                    <option value="balanced">Balanced</option>
-                                    <option value="vegetarian">Vegetarian</option>
-                                    <option value="vegan">Vegan</option>
-                                    <option value="keto">Keto</option>
-                                    <option value="low_carb">Low Carb</option>
-                                    <option value="gluten_free">Gluten Free</option>
-                                </select>
-                            </div>
-
-                            <!-- Target Weight -->
-                            <div class="form-group">
-                                <label for="targetWeight">What's your target weight? (optional)</label>
-                                <input type="number" id="targetWeight" placeholder="Enter in lbs or kgs">
-                            </div>
-
-                            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 20px;">
-                                Complete Profile & Get Started
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            `;
-
-            document.body.appendChild(profilingModal);
-
-            // Close button
-            document.getElementById('closeProfiling').addEventListener('click', () => {
-                document.body.removeChild(profilingModal);
-                resolve(null);
-            });
-
-            // Handle form submission
-            document.getElementById('profilingForm').addEventListener('submit', (e) => {
-                e.preventDefault();
-                
-                const formData = new FormData(e.target);
-                const workoutTypes = formData.getAll('workoutType');
-                const equipment = formData.getAll('equipment');
-
-                const profile = {
-                    fitnessLevel: document.getElementById('fitnessLevel').value,
-                    fitnessGoal: document.getElementById('fitnessGoal').value,
-                    preferredWorkouts: workoutTypes,
-                    equipmentAvailable: equipment,
-                    workoutTime: document.getElementById('workoutTime').value,
-                    dietaryPreference: document.getElementById('dietaryPreference').value,
-                    targetWeight: document.getElementById('targetWeight').value || null
-                };
-
-                document.body.removeChild(profilingModal);
-                resolve(profile);
-            });
-
-            // Close modal when clicking outside
-            profilingModal.addEventListener('click', (e) => {
-                if (e.target === profilingModal) {
-                    document.body.removeChild(profilingModal);
-                    resolve(null);
-                }
-            });
-        });
-    }
-
-    handleSocialLogin() {
-        const socialUser = {
-            name: 'Social User',
-            email: 'social@example.com',
-            joinDate: new Date().toISOString(),
-            social: true,
-            userId: this.generateUserId()
-        };
-
-        if (this.storage.set('healthai_current_user', socialUser)) {
-            this.currentUser = socialUser;
-            this.handleUserLoggedIn();
-            this.closeAuthModal();
-            this.showToast('Social login successful! Welcome to HealthAI.', 'success');
-            
-            setTimeout(() => {
-                window.location.href = 'dashboard.html';
-            }, 1500);
-        }
-    }
-
-    handleLogout(e) {
-        e.preventDefault();
-        
-        this.storage.remove('healthai_current_user');
-        this.storage.remove('healthai_user');
-        this.currentUser = null;
-        
-        this.handleUserLoggedOut();
-        
-        const userDropdown = document.getElementById('userDropdown');
-        if (userDropdown) userDropdown.classList.remove('active');
-        
-        this.showToast('You have been logged out successfully.', 'info');
-        
-        setTimeout(() => {
-            window.location.href = 'index.html';
-        }, 1000);
-    }
-
-    toggleUserMenu(e) {
-        e.stopPropagation();
-        const userDropdown = document.getElementById('userDropdown');
-        const userAvatar = document.getElementById('userAvatar');
-        
-        if (userDropdown && userAvatar) {
-            const isExpanded = userDropdown.classList.toggle('active');
-            userAvatar.setAttribute('aria-expanded', isExpanded.toString());
-        }
-    }
-
-    // Utility methods
-    validateEmail(email) {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return emailRegex.test(email);
-    }
-
-    generateUserId() {
-        return 'user_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now().toString(36);
-    }
-
-    simulateAPICall(duration) {
-        return new Promise(resolve => setTimeout(resolve, duration));
-    }
-
-    showToast(message, type = 'info') {
-        // Remove existing toasts
-        document.querySelectorAll('.toast-message').forEach(toast => toast.remove());
-
-        const toast = document.createElement('div');
-        toast.className = `toast-message toast-${type}`;
-        toast.setAttribute('role', 'alert');
-        toast.setAttribute('aria-live', 'polite');
-        
-        toast.innerHTML = `
-            <span>${message}</span>
-            <button onclick="this.parentElement.remove()" aria-label="Close notification">
-                &times;
-            </button>
-        `;
-
-        document.body.appendChild(toast);
-
-        // Auto remove after 5 seconds
-        setTimeout(() => {
-            if (toast.parentElement) {
-                toast.remove();
-            }
-        }, 5000);
-    }
-}
-
-// Initialize the authentication system
-const healthAIAuth = new HealthAIAuth();
+    };
+    
+    console.log('✅ Enhanced auth system script loaded');
+    
+})();

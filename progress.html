@@ -7,6 +7,259 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="styles/main.css">
     <link rel="stylesheet" href="styles/responsive.css">
+    <!-- Add Chart.js for better charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Additional styles for new features */
+        .progress-details {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 30px;
+            margin: 30px auto;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .metric-input {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+        
+        .input-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-color);
+            font-weight: 500;
+        }
+        
+        .input-group input,
+        .input-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--bg-color);
+            color: var(--text-color);
+            font-size: 16px;
+        }
+        
+        .compare-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin: 40px 0;
+        }
+        
+        .compare-card {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 12px;
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .comparison-metric {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 15px 0;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .comparison-value {
+            font-size: 1.2em;
+            font-weight: 600;
+        }
+        
+        .improvement {
+            color: #10b981;
+            font-size: 0.9em;
+        }
+        
+        .decline {
+            color: #ef4444;
+            font-size: 0.9em;
+        }
+        
+        .notes-section {
+            margin-top: 40px;
+        }
+        
+        .notes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .note-card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            position: relative;
+        }
+        
+        .note-date {
+            font-size: 0.8em;
+            color: var(--text-light);
+            margin-bottom: 10px;
+        }
+        
+        .add-note-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 20px 0;
+        }
+        
+        .export-options {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .export-btn {
+            padding: 12px 24px;
+            border: 2px solid var(--primary-color);
+            background: transparent;
+            color: var(--primary-color);
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .export-btn:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .progress-goals {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .goal-card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #3b82f6;
+        }
+        
+        .goal-progress {
+            height: 8px;
+            background: var(--border-color);
+            border-radius: 4px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+        
+        .goal-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+        
+        .milestone-timeline {
+            margin: 40px 0;
+            position: relative;
+        }
+        
+        .timeline-item {
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 3px solid var(--primary-color);
+            background: var(--card-bg);
+            border-radius: 0 8px 8px 0;
+            position: relative;
+        }
+        
+        .timeline-date {
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+        
+        .timeline-content {
+            color: var(--text-color);
+        }
+        
+        .share-progress {
+            text-align: center;
+            margin: 40px 0;
+            padding: 30px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 2px dashed var(--border-color);
+        }
+        
+        .share-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .share-btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: transform 0.2s ease;
+        }
+        
+        .share-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .share-facebook {
+            background: #1877f2;
+            color: white;
+        }
+        
+        .share-twitter {
+            background: #1da1f2;
+            color: white;
+        }
+        
+        .share-instagram {
+            background: linear-gradient(45deg, #405de6, #5851db, #833ab4, #c13584, #e1306c, #fd1d1d);
+            color: white;
+        }
+        
+        .canvas-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+            margin: 20px 0;
+        }
+    </style>
 </head>
 <body>
     <!-- Header -->
@@ -55,10 +308,10 @@
                 <p>Track your fitness achievements and health improvements</p>
             </div>
             <div class="progress-period">
-                <button class="period-btn active">This Week</button>
-                <button class="period-btn">This Month</button>
-                <button class="period-btn">Last 3 Months</button>
-                <button class="period-btn">All Time</button>
+                <button class="period-btn active" data-period="week">This Week</button>
+                <button class="period-btn" data-period="month">This Month</button>
+                <button class="period-btn" data-period="quarter">Last 3 Months</button>
+                <button class="period-btn" data-period="all">All Time</button>
             </div>
         </div>
     </section>
@@ -100,6 +353,41 @@
         </div>
     </section>
 
+    <!-- Progress Input Section -->
+    <section class="progress-details">
+        <div class="container">
+            <h2 class="section-title">Log Today's Progress</h2>
+            <div class="metric-input">
+                <div class="input-group">
+                    <label for="weightInput">Today's Weight (lbs)</label>
+                    <input type="number" id="weightInput" step="0.1" placeholder="Enter your weight">
+                </div>
+                <div class="input-group">
+                    <label for="workoutTime">Workout Time (minutes)</label>
+                    <input type="number" id="workoutTime" placeholder="Enter workout duration">
+                </div>
+                <div class="input-group">
+                    <label for="caloriesBurned">Calories Burned</label>
+                    <input type="number" id="caloriesBurned" placeholder="Enter calories burned">
+                </div>
+                <div class="input-group">
+                    <label for="mood">Today's Mood</label>
+                    <select id="mood">
+                        <option value="">Select mood</option>
+                        <option value="5">😊 Excellent</option>
+                        <option value="4">🙂 Good</option>
+                        <option value="3">😐 Average</option>
+                        <option value="2">😕 Below Average</option>
+                        <option value="1">😞 Poor</option>
+                    </select>
+                </div>
+            </div>
+            <button class="add-note-btn" id="logProgressBtn">
+                <i class="fas fa-plus"></i> Log Today's Progress
+            </button>
+        </div>
+    </section>
+
     <!-- Progress Charts -->
     <section class="progress-charts">
         <div class="container">
@@ -107,29 +395,142 @@
             <div class="charts-grid">
                 <div class="chart-card">
                     <h3>Weight Trend</h3>
-                    <div class="chart-placeholder">
-                        <p>Weight tracking chart would appear here</p>
-                        <div class="chart-bars">
-                            <div class="bar" style="height: 70%"></div>
-                            <div class="bar" style="height: 65%"></div>
-                            <div class="bar" style="height: 60%"></div>
-                            <div class="bar" style="height: 55%"></div>
-                            <div class="bar" style="height: 50%"></div>
-                        </div>
+                    <div class="canvas-container">
+                        <canvas id="weightChart"></canvas>
                     </div>
                 </div>
                 <div class="chart-card">
                     <h3>Workout Frequency</h3>
-                    <div class="chart-placeholder">
-                        <p>Workout frequency chart would appear here</p>
-                        <div class="chart-line">
-                            <div class="point" style="bottom: 30%"></div>
-                            <div class="point" style="bottom: 50%"></div>
-                            <div class="point" style="bottom: 70%"></div>
-                            <div class="point" style="bottom: 80%"></div>
-                            <div class="point" style="bottom: 85%"></div>
+                    <div class="canvas-container">
+                        <canvas id="workoutChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <h3>Calories Burned</h3>
+                    <div class="canvas-container">
+                        <canvas id="caloriesChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <h3>Sleep Quality Trend</h3>
+                    <div class="canvas-container">
+                        <canvas id="sleepChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Progress Comparison -->
+    <section class="progress-details">
+        <div class="container">
+            <h2 class="section-title">Progress Comparison</h2>
+            <div class="compare-section">
+                <div class="compare-card">
+                    <h3>This Week vs Last Week</h3>
+                    <div class="comparison-metric">
+                        <span>Workouts Completed</span>
+                        <div>
+                            <span class="comparison-value">5</span>
+                            <span class="improvement">↑ 25%</span>
                         </div>
                     </div>
+                    <div class="comparison-metric">
+                        <span>Average Calories Burned</span>
+                        <div>
+                            <span class="comparison-value">420</span>
+                            <span class="improvement">↑ 15%</span>
+                        </div>
+                    </div>
+                    <div class="comparison-metric">
+                        <span>Sleep Duration</span>
+                        <div>
+                            <span class="comparison-value">7.2h</span>
+                            <span class="decline">↓ 0.3h</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="compare-card">
+                    <h3>Monthly Progress</h3>
+                    <div class="comparison-metric">
+                        <span>Weight Change</span>
+                        <div>
+                            <span class="comparison-value">-4.2 lbs</span>
+                            <span class="improvement">On Track</span>
+                        </div>
+                    </div>
+                    <div class="comparison-metric">
+                        <span>Total Workouts</span>
+                        <div>
+                            <span class="comparison-value">18</span>
+                            <span class="improvement">↑ 20%</span>
+                        </div>
+                    </div>
+                    <div class="comparison-metric">
+                        <span>Consistency Score</span>
+                        <div>
+                            <span class="comparison-value">85%</span>
+                            <span class="improvement">↑ 5%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Goals Section -->
+    <section class="progress-details">
+        <div class="container">
+            <h2 class="section-title">Current Goals</h2>
+            <div class="progress-goals">
+                <div class="goal-card">
+                    <h3>Weight Loss Goal</h3>
+                    <p>Target: Lose 20 lbs total</p>
+                    <div class="goal-progress">
+                        <div class="goal-progress-bar" style="width: 42.5%"></div>
+                    </div>
+                    <p>Progress: 8.5/20 lbs (42.5%)</p>
+                </div>
+                <div class="goal-card">
+                    <h3>Workout Consistency</h3>
+                    <p>Target: 90% consistency for 30 days</p>
+                    <div class="goal-progress">
+                        <div class="goal-progress-bar" style="width: 60%"></div>
+                    </div>
+                    <p>Progress: 18/30 days (60%)</p>
+                </div>
+                <div class="goal-card">
+                    <h3>Running Distance</h3>
+                    <p>Target: Run 50 miles this month</p>
+                    <div class="goal-progress">
+                        <div class="goal-progress-bar" style="width: 35%"></div>
+                    </div>
+                    <p>Progress: 17.5/50 miles (35%)</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Milestone Timeline -->
+    <section class="progress-details">
+        <div class="container">
+            <h2 class="section-title">Milestone Timeline</h2>
+            <div class="milestone-timeline">
+                <div class="timeline-item">
+                    <div class="timeline-date">Today</div>
+                    <div class="timeline-content">Logged 45-minute HIIT workout and burned 520 calories</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">3 Days Ago</div>
+                    <div class="timeline-content">Achieved personal best in 5K run - 24:35 minutes</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">1 Week Ago</div>
+                    <div class="timeline-content">Reached 10,000 total calories burned milestone</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">2 Weeks Ago</div>
+                    <div class="timeline-content">Completed first week with 5 consecutive workouts</div>
                 </div>
             </div>
         </div>
@@ -172,16 +573,302 @@
                     <p>Log meals for 30 consecutive days</p>
                     <span class="achievement-progress">18/30 days</span>
                 </div>
+                <div class="achievement-card unlocked">
+                    <div class="achievement-icon">
+                        <i class="fas fa-running"></i>
+                    </div>
+                    <h3>5K Runner</h3>
+                    <p>Complete a 5K run under 30 minutes</p>
+                    <span class="achievement-date">Earned: 3 days ago</span>
+                </div>
+                <div class="achievement-card locked">
+                    <div class="achievement-icon">
+                        <i class="fas fa-moon"></i>
+                    </div>
+                    <h3>Sleep Master</h3>
+                    <p>7+ hours sleep for 14 consecutive days</p>
+                    <span class="achievement-progress">9/14 days</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Progress Notes -->
+    <section class="progress-details notes-section">
+        <div class="container">
+            <h2 class="section-title">Progress Notes & Reflections</h2>
+            <button class="add-note-btn" id="addNoteBtn">
+                <i class="fas fa-edit"></i> Add New Note
+            </button>
+            <div class="notes-grid">
+                <div class="note-card">
+                    <div class="note-date">Yesterday</div>
+                    <p>Feeling stronger during workouts. Noticed improvement in stamina during cardio sessions. Need to focus more on post-workout stretching.</p>
+                </div>
+                <div class="note-card">
+                    <div class="note-date">3 Days Ago</div>
+                    <p>Hit a new PR in bench press! 185 lbs for 5 reps. Energy levels are good, but sleep quality could be better.</p>
+                </div>
+                <div class="note-card">
+                    <div class="note-date">1 Week Ago</div>
+                    <p>Started incorporating more protein in my diet. Feeling less hungry between meals and more energy throughout the day.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Share Progress -->
+    <section class="share-progress">
+        <div class="container">
+            <h2 class="section-title">Share Your Progress</h2>
+            <p>Celebrate your achievements with friends and family!</p>
+            <div class="share-buttons">
+                <button class="share-btn share-facebook">
+                    <i class="fab fa-facebook-f"></i> Share on Facebook
+                </button>
+                <button class="share-btn share-twitter">
+                    <i class="fab fa-twitter"></i> Share on Twitter
+                </button>
+                <button class="share-btn share-instagram">
+                    <i class="fab fa-instagram"></i> Share on Instagram
+                </button>
+                <button class="export-btn" id="exportProgress">
+                    <i class="fas fa-file-export"></i> Export Progress Report
+                </button>
             </div>
         </div>
     </section>
 
     <!-- Footer -->
     <footer>
-        <!-- Same footer as previous pages -->
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <i class="fas fa-brain"></i>
+                    <span>HealthAI</span>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-column">
+                        <h4>Product</h4>
+                        <a href="#">Features</a>
+                        <a href="#">Pricing</a>
+                        <a href="#">FAQ</a>
+                    </div>
+                    <div class="footer-column">
+                        <h4>Company</h4>
+                        <a href="#">About Us</a>
+                        <a href="#">Blog</a>
+                        <a href="#">Contact</a>
+                    </div>
+                    <div class="footer-column">
+                        <h4>Legal</h4>
+                        <a href="#">Privacy Policy</a>
+                        <a href="#">Terms of Service</a>
+                        <a href="#">Cookie Policy</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 HealthAI. All rights reserved.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-linkedin"></i></a>
+                </div>
+            </div>
+        </div>
     </footer>
 
     <script src="js/auth.js"></script>
     <script src="js/progress.js"></script>
+    <script>
+        // Initialize Charts
+        document.addEventListener('DOMContentLoaded', function() {
+            // Weight Chart
+            const weightCtx = document.getElementById('weightChart').getContext('2d');
+            const weightChart = new Chart(weightCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6'],
+                    datasets: [{
+                        label: 'Weight (lbs)',
+                        data: [185, 182.5, 180.5, 179, 177.5, 176.5],
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true
+                        }
+                    }
+                }
+            });
+
+            // Workout Chart
+            const workoutCtx = document.getElementById('workoutChart').getContext('2d');
+            const workoutChart = new Chart(workoutCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [{
+                        label: 'Workout Minutes',
+                        data: [45, 60, 30, 75, 45, 90, 0],
+                        backgroundColor: '#8b5cf6',
+                        borderColor: '#7c3aed',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true
+                        }
+                    }
+                }
+            });
+
+            // Calories Chart
+            const caloriesCtx = document.getElementById('caloriesChart').getContext('2d');
+            const caloriesChart = new Chart(caloriesCtx, {
+                type: 'radar',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [{
+                        label: 'Calories Burned',
+                        data: [420, 580, 310, 650, 420, 720, 0],
+                        backgroundColor: 'rgba(239, 68, 68, 0.2)',
+                        borderColor: '#ef4444',
+                        pointBackgroundColor: '#ef4444'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+
+            // Sleep Chart
+            const sleepCtx = document.getElementById('sleepChart').getContext('2d');
+            const sleepChart = new Chart(sleepCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [{
+                        label: 'Sleep Hours',
+                        data: [7.5, 6.8, 7.2, 7.0, 6.5, 8.2, 7.8],
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+
+            // Progress Logging
+            const logProgressBtn = document.getElementById('logProgressBtn');
+            logProgressBtn.addEventListener('click', function() {
+                const weight = document.getElementById('weightInput').value;
+                const workoutTime = document.getElementById('workoutTime').value;
+                const caloriesBurned = document.getElementById('caloriesBurned').value;
+                const mood = document.getElementById('mood').value;
+
+                if (!weight && !workoutTime && !caloriesBurned) {
+                    alert('Please enter at least one metric to log!');
+                    return;
+                }
+
+                // Here you would typically send this data to your backend
+                console.log('Logging progress:', {
+                    weight,
+                    workoutTime,
+                    caloriesBurned,
+                    mood
+                });
+
+                // Show success message
+                alert('Progress logged successfully!');
+
+                // Clear inputs
+                document.getElementById('weightInput').value = '';
+                document.getElementById('workoutTime').value = '';
+                document.getElementById('caloriesBurned').value = '';
+                document.getElementById('mood').value = '';
+            });
+
+            // Add Note Functionality
+            const addNoteBtn = document.getElementById('addNoteBtn');
+            addNoteBtn.addEventListener('click', function() {
+                const note = prompt('Enter your progress note:');
+                if (note && note.trim()) {
+                    // Create new note card
+                    const notesGrid = document.querySelector('.notes-grid');
+                    const newNote = document.createElement('div');
+                    newNote.className = 'note-card';
+                    newNote.innerHTML = `
+                        <div class="note-date">Just now</div>
+                        <p>${note}</p>
+                    `;
+                    notesGrid.insertBefore(newNote, notesGrid.firstChild);
+                }
+            });
+
+            // Export Progress
+            const exportBtn = document.getElementById('exportProgress');
+            exportBtn.addEventListener('click', function() {
+                // In a real app, this would generate and download a PDF/CSV report
+                alert('Progress report is being generated...\n(A real implementation would generate a PDF/CSV file)');
+            });
+
+            // Period Selection
+            const periodBtns = document.querySelectorAll('.period-btn');
+            periodBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // Remove active class from all buttons
+                    periodBtns.forEach(b => b.classList.remove('active'));
+                    // Add active class to clicked button
+                    this.classList.add('active');
+                    
+                    // Update charts based on selected period
+                    const period = this.dataset.period;
+                    updateChartsForPeriod(period);
+                });
+            });
+
+            function updateChartsForPeriod(period) {
+                // This function would update chart data based on the selected period
+                console.log('Updating charts for period:', period);
+                // In a real app, you would fetch new data from your backend
+            }
+
+            // Share buttons
+            document.querySelectorAll('.share-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const platform = this.textContent.includes('Facebook') ? 'Facebook' :
+                                   this.textContent.includes('Twitter') ? 'Twitter' : 'Instagram';
+                    alert(`Sharing progress on ${platform}...\n(In a real app, this would open the share dialog)`);
+                });
+            });
+
+            // Initialize progress circles
+            const progressCircles = document.querySelectorAll('.progress-circle');
+            progressCircles.forEach(circle => {
+                const percentage = circle.dataset.percentage;
+                circle.style.setProperty('--percentage', `${percentage}%`);
+            });
+        });
+    </script>
 </body>
 </html>
