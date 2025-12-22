@@ -44,8 +44,25 @@ A complete fitness tracking web application with user authentication, workout ma
 - Modern web browser
 - Local server (for development)
 
-### Installation
-1. **Clone the repository:**
-```bash
-git clone https://github.com/yourusername/health-fitness-assistant.git
-cd health-fitness-assistant
+# 📁 Project Structure
+Health-Fitness-Assistant/
+├── 📄 index.html              # Homepage (Signup/Login)
+├── 📄 dashboard.html          # Main Dashboard
+├── 📄 workouts.html           # Workouts Management
+├── 📄 nutrition.html          # Nutrition Tracking
+├── 📄 progress.html           # Progress Analytics
+├── 📄 profile.html            # User Profile
+├── 📄 chat.html              # AI Fitness Assistant
+├── 📄 detail.html            # Workout Details
+├── 📁 styles/
+│   ├── 📄 main.css           # Main Stylesheet
+│   └── 📄 responsive.css     # Responsive Styles
+├── 📁 js/
+│   ├── 📄 auth.js            # Authentication System
+│   ├── 📄 main.js           # Core Functions
+│   ├── 📄 dashboard.js      # Dashboard Logic
+│   ├── 📄 profile.js        # Profile Management
+│   ├── 📄 workouts.js       # Workout Functions
+│   ├── 📄 chat.js          # Chat Assistant
+│   └── 📄 ...              # Other JS files
+└── 📄 README.md             # Documentation
