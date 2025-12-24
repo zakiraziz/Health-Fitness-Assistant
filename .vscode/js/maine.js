@@ -549,6 +549,235 @@ class HealthAIProgressDashboard {
             `;
         }).join('');
     }
+    updateMilestones() {
+        const milestones = this.calculateMilestones();
+        const milestonesContainer = document.getElementById('milestonesContainer');
+        
+        if (!milestonesContainer) return;
+        
+        milestonesContainer.innerHTML = milestones.map(milestone => `
+            <div class="milestone-item">
+                <div class="milestone-date">${milestone.date}</div>
+                <div class="milestone-content">
+                    <strong>${milestone.title}</strong>
+                    <p>${milestone.description}</p>
+                </div>
+                <div class="milestone-badge">
+                    <i class="${milestone.icon}"></i>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    updateRecentActivity() {
+        const recentData = this.getLastNDaysData(5).reverse();
+        const activityContainer = document.getElementById('recentActivity');
+        
+        if (!activityContainer) return;
+        
+        activityContainer.innerHTML = recentData.map(day => `
+            <div class="activity-item">
+                <div class="activity-date">
+                    ${new Date(day.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+                </div>
+                <div class="activity-content">
+                    <div class="activity-metric">
+                        <i class="fas fa-weight"></i>
+                        <span>${day.weight?.toFixed(1) || '--'} lbs</span>
+                    </div>
+                    <div class="activity-metric">
+                        <i class="fas fa-dumbbell"></i>
+                        <span>${day.workoutTime || 0} min</span>
+                    </div>
+                    <div class="activity-metric">
+                        <i class="fas fa-fire"></i>
+                        <span>${day.caloriesBurned || 0} cal</span>
+                    </div>
+                    <div class="activity-metric">
+                        <i class="fas fa-bed"></i>
+                        <span>${day.sleepHours?.toFixed(1) || '--'}h</span>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    updateProgressSummary() {
+        const summary = this.generateProgressSummary();
+        const summaryElement = document.getElementById('progressSummary');
+        
+        if (summaryElement) {
+            summaryElement.innerHTML = `
+                <div class="summary-item">
+                    <i class="fas fa-calendar-check"></i>
+                    <div>
+                        <strong>${summary.totalDays} Days</strong>
+                        <small>Total tracking period</small>
+                    </div>
+                </div>
+                <div class="summary-item">
+                    <i class="fas fa-dumbbell"></i>
+                    <div>
+                        <strong>${summary.workoutDays} Days</strong>
+                        <small>Workouts completed</small>
+                    </div>
+                </div>
+                <div class="summary-item">
+                    <i class="fas fa-fire"></i>
+                    <div>
+                        <strong>${summary.totalCalories.toLocaleString()} cal</strong>
+                        <small>Total calories burned</small>
+                    </div>
+                </div>
+                <div class="summary-item">
+                    <i class="fas fa-trend-down"></i>
+                    <div>
+                        <strong>${summary.weightChange.toFixed(1)} lbs</strong>
+                        <small>Weight ${summary.weightChange < 0 ? 'lost' : 'gained'}</small>
+                    </div>
+                </div>
+            `;
+        }
+    }
+
+    // ========== UTILITIES ==========
+    getLastNDaysData(n) {
+        const today = new Date();
+        const result = [];
+        
+        for (let i = 0; i < n; i++) {
+            const date = new Date(today);
+            date.setDate(date.getDate() - i);
+            const dateStr = date.toISOString().split('T')[0];
+            
+            const dayData = this.progressData.find(d => d.date === dateStr);
+            if (dayData) {
+                result.unshift(dayData);
+            } else {
+                // Fill with empty data if no data for that day
+                result.unshift({
+                    date: dateStr,
+                    weight: null,
+                    workoutTime: 0,
+                    caloriesBurned: 0,
+                    sleepHours: 0,
+                    mood: 3
+                });
+            }
+        }
+        
+        return result;
+    }
+
+    calculateDaysRemaining(deadline) {
+        const today = new Date();
+        const deadlineDate = new Date(deadline);
+        const diffTime = deadlineDate - today;
+        return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    }
+
+    calculateMilestones() {
+        const milestones = [];
+        const data = this.progressData;
+        
+        if (data.length >= 7) {
+            const firstWeekData = data.slice(0, 7);
+            const workouts = firstWeekData.filter(d => d.workoutTime > 0).length;
+            if (workouts >= 5) {
+                milestones.push({
+                    date: 'Week 1',
+                    title: 'First Week Complete',
+                    description: `Completed ${workouts} workouts in your first week`,
+                    icon: 'fas fa-award'
+                });
+            }
+        }
+        
+        const totalCalories = data.reduce((sum, d) => sum + d.caloriesBurned, 0);
+        if (totalCalories >= 10000) {
+            milestones.push({
+                date: 'Recent',
+                title: 'Calorie Burner',
+                description: 'Burned 10,000 total calories',
+                icon: 'fas fa-fire'
+            });
+        }
+        
+        const weightChange = data[data.length - 1]?.weight - data[0]?.weight || 0;
+        if (weightChange <= -5) {
+            milestones.push({
+                date: 'Recent',
+                title: 'Weight Loss Milestone',
+                description: `Lost ${Math.abs(weightChange).toFixed(1)} lbs`,
+                icon: 'fas fa-weight'
+            });
+        }
+        
+        return milestones;
+    }
+
+    generateProgressSummary() {
+        const data = this.progressData;
+        return {
+            totalDays: data.length,
+            workoutDays: data.filter(d => d.workoutTime > 0).length,
+            totalCalories: data.reduce((sum, d) => sum + d.caloriesBurned, 0),
+            weightChange: (data[data.length - 1]?.weight || 0) - (data[0]?.weight || 0),
+            averageWorkoutTime: (data.reduce((sum, d) => sum + d.workoutTime, 0) / data.length).toFixed(1),
+            averageSleep: (data.reduce((sum, d) => sum + d.sleepHours, 0) / data.length).toFixed(1)
+        };
+    }
+
+    // ========== EVENT HANDLERS ==========
+    setupEventListeners() {
+        // Period selector
+        document.querySelectorAll('.period-selector').forEach(button => {
+            button.addEventListener('click', (e) => this.handlePeriodChange(e));
+        });
+
+        // Log progress
+        const logButton = document.getElementById('logProgress');
+        if (logButton) {
+            logButton.addEventListener('click', () => this.showLogModal());
+        }
+
+        // Export data
+        const exportButton = document.getElementById('exportData');
+        if (exportButton) {
+            exportButton.addEventListener('click', () => this.exportData());
+        }
+
+        // Share progress
+        const shareButton = document.getElementById('shareProgress');
+        if (shareButton) {
+            shareButton.addEventListener('click', () => this.shareProgress());
+        }
+
+        // Refresh data
+        const refreshButton = document.getElementById('refreshData');
+        if (refreshButton) {
+            refreshButton.addEventListener('click', () => this.refreshDashboard());
+        }
+
+        // Theme toggle
+        const themeToggle = document.getElementById('themeToggle');
+        if (themeToggle) {
+            themeToggle.addEventListener('click', () => this.toggleTheme());
+        }
+    }
+
+    handlePeriodChange(event) {
+        const period = event.target.dataset.period;
+        document.querySelectorAll('.period-selector').forEach(btn => {
+            btn.classList.toggle('active', btn === event.target);
+        });
+        
+        // Update charts for selected period
+        this.updateChartsForPeriod(period);
+    }
+
+    showLogModal() {
+      
 
 
 
