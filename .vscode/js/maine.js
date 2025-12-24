@@ -309,3 +309,246 @@ class HealthAIProgressDashboard {
             }
         });
     }
+
+    initConsistencyChart() {
+        const ctx = document.getElementById('consistencyChart');
+        if (!ctx) return;
+
+        const data = this.getLastNDaysData(30);
+        const workoutDays = data.filter(d => d.workoutTime > 0).length;
+        const consistency = (workoutDays / 30) * 100;
+        
+        this.charts.consistency = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Workout Days', 'Rest Days'],
+                datasets: [{
+                    data: [workoutDays, 30 - workoutDays],
+                    backgroundColor: ['#10b981', '#e5e7eb'],
+                    borderWidth: 2,
+                    borderColor: '#ffffff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '70%',
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const value = context.raw;
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = Math.round((value / total) * 100);
+                                return `${context.label}: ${value} days (${percentage}%)`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    getChartOptions(title, unit) {
+        return {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: true, position: 'top' },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false,
+                    callbacks: {
+                        label: function(context) {
+                            return `${context.dataset.label}: ${context.parsed.y} ${unit}`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: { display: true, text: unit }
+                }
+            }
+        };
+    }
+
+    // ========== DASHBOARD UPDATES ==========
+    updateDashboard() {
+        this.updateStats();
+        this.updateGoals();
+        this.updateAchievements();
+        this.updateMilestones();
+        this.updateRecentActivity();
+        this.updateProgressSummary();
+    }
+
+    updateStats() {
+        const stats = this.calculateStats();
+        
+        // Update progress circles
+        document.querySelectorAll('.progress-circle').forEach((circle, index) => {
+            let percentage;
+            switch(index) {
+                case 0: percentage = stats.consistency; break;
+                case 1: percentage = stats.nutritionScore; break;
+                case 2: percentage = stats.sleepQuality; break;
+            }
+            
+            if (percentage !== undefined) {
+                circle.dataset.percentage = percentage;
+                circle.querySelector('span').textContent = `${percentage}%`;
+                circle.style.setProperty('--percentage', `${percentage}%`);
+            }
+        });
+
+        // Update weight progress
+        const weightElement = document.querySelector('.weight-progress');
+        if (weightElement) {
+            const weightChange = stats.currentWeight - stats.startingWeight;
+            const trend = weightChange < 0 ? '↓' : weightChange > 0 ? '↑' : '→';
+            const color = weightChange < 0 ? '#10b981' : weightChange > 0 ? '#ef4444' : '#6b7280';
+            
+            weightElement.innerHTML = `
+                <span class="weight-change" style="color: ${color}">
+                    ${trend} ${Math.abs(weightChange).toFixed(1)} lbs
+                </span>
+                <small>From ${stats.startingWeight} to ${stats.currentWeight} lbs</small>
+            `;
+        }
+
+        // Update streak
+        const streakElement = document.getElementById('currentStreak');
+        if (streakElement) {
+            streakElement.textContent = stats.currentStreak;
+            streakElement.style.color = stats.currentStreak >= 7 ? '#10b981' : '#f59e0b';
+        }
+    }
+
+    calculateStats() {
+        if (this.progressData.length === 0) return {};
+        
+        const recentData = this.getLastNDaysData(7);
+        const allData = this.progressData;
+        
+        const stats = {
+            consistency: Math.round((recentData.filter(d => d.workoutTime > 0).length / 7) * 100),
+            nutritionScore: this.calculateNutritionScore(),
+            sleepQuality: Math.round((recentData.reduce((sum, d) => sum + d.sleepHours, 0) / 7) * 10),
+            currentWeight: allData[allData.length - 1]?.weight || 0,
+            startingWeight: allData[0]?.weight || 0,
+            totalWorkouts: allData.filter(d => d.workoutTime > 0).length,
+            totalCalories: allData.reduce((sum, d) => sum + d.caloriesBurned, 0),
+            averageMood: (recentData.reduce((sum, d) => sum + d.mood, 0) / recentData.length).toFixed(1),
+            currentStreak: this.calculateCurrentStreak()
+        };
+        
+        return stats;
+    }
+
+    calculateNutritionScore() {
+        // Simulate nutrition score calculation
+        const recentData = this.getLastNDaysData(7);
+        let score = 75; // Base score
+        
+        // Adjust based on water intake
+        const avgWater = recentData.reduce((sum, d) => sum + (d.waterIntake || 0), 0) / 7;
+        if (avgWater >= 8) score += 10;
+        else if (avgWater >= 6) score += 5;
+        else score -= 5;
+        
+        // Adjust based on consistency
+        const workoutDays = recentData.filter(d => d.workoutTime > 0).length;
+        if (workoutDays >= 5) score += 10;
+        else if (workoutDays >= 3) score += 5;
+        
+        return Math.min(Math.max(score, 0), 100);
+    }
+
+    calculateCurrentStreak() {
+        let streak = 0;
+        let today = new Date();
+        
+        // Check consecutive days with workouts
+        for (let i = 0; i < 30; i++) {
+            const date = new Date(today);
+            date.setDate(date.getDate() - i);
+            const dateStr = date.toISOString().split('T')[0];
+            
+            const dayData = this.progressData.find(d => d.date === dateStr);
+            if (dayData && dayData.workoutTime > 0) {
+                streak++;
+            } else {
+                break;
+            }
+        }
+        
+        return streak;
+    }
+
+    updateGoals() {
+        const goalsContainer = document.getElementById('goalsContainer');
+        if (!goalsContainer) return;
+        
+        goalsContainer.innerHTML = this.goals.map(goal => {
+            const progress = (goal.current / goal.target) * 100;
+            const daysRemaining = this.calculateDaysRemaining(goal.deadline);
+            
+            return `
+                <div class="goal-card" data-goal-id="${goal.id}">
+                    <div class="goal-header">
+                        <h4>${goal.title}</h4>
+                        <span class="goal-progress-text">${progress.toFixed(1)}%</span>
+                    </div>
+                    <div class="goal-progress-bar">
+                        <div class="goal-progress-fill" 
+                             style="width: ${progress}%; background: ${goal.color}"></div>
+                    </div>
+                    <div class="goal-details">
+                        <span>${goal.current} / ${goal.target} ${goal.unit}</span>
+                        <small>${daysRemaining} days remaining</small>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    updateAchievements() {
+        const achievementsContainer = document.getElementById('achievementsContainer');
+        if (!achievementsContainer) return;
+        
+        achievementsContainer.innerHTML = this.achievements.map(achievement => {
+            const isUnlocked = achievement.unlocked;
+            const progress = achievement.progress ? 
+                `<div class="achievement-progress">
+                    <span>${achievement.progress}/${achievement.target} ${achievement.unit}</span>
+                    <div class="progress-bar">
+                        <div style="width: ${(achievement.progress/achievement.target)*100}%"></div>
+                    </div>
+                </div>` : '';
+            
+            return `
+                <div class="achievement-card ${isUnlocked ? 'unlocked' : 'locked'}">
+                    <div class="achievement-icon">
+                        <i class="${achievement.icon}"></i>
+                    </div>
+                    <div class="achievement-content">
+                        <h4>${achievement.title}</h4>
+                        <p>${achievement.description}</p>
+                        ${progress}
+                        ${isUnlocked ? 
+                            `<span class="achievement-date">Earned: ${new Date(achievement.date).toLocaleDateString()}</span>` : 
+                            `<span class="achievement-points">${achievement.points} points</span>`
+                        }
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+
+
