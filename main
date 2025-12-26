@@ -715,5 +715,355 @@ class HealthAIProgressDashboard {
         
         return milestones;
     }
+generateProgressSummary() {
+        const data = this.progressData;
+        return {
+            totalDays: data.length,
+            workoutDays: data.filter(d => d.workoutTime > 0).length,
+            totalCalories: data.reduce((sum, d) => sum + d.caloriesBurned, 0),
+            weightChange: (data[data.length - 1]?.weight || 0) - (data[0]?.weight || 0),
+            averageWorkoutTime: (data.reduce((sum, d) => sum + d.workoutTime, 0) / data.length).toFixed(1),
+            averageSleep: (data.reduce((sum, d) => sum + d.sleepHours, 0) / data.length).toFixed(1)
+        };
+    }
+
+    // ========== EVENT HANDLERS ==========
+    setupEventListeners() {
+        // Period selector
+        document.querySelectorAll('.period-selector').forEach(button => {
+            button.addEventListener('click', (e) => this.handlePeriodChange(e));
+        });
+
+        // Log progress
+        const logButton = document.getElementById('logProgress');
+        if (logButton) {
+            logButton.addEventListener('click', () => this.showLogModal());
+        }
+
+        // Export data
+        const exportButton = document.getElementById('exportData');
+        if (exportButton) {
+            exportButton.addEventListener('click', () => this.exportData());
+        }
+
+        // Share progress
+        const shareButton = document.getElementById('shareProgress');
+        if (shareButton) {
+            shareButton.addEventListener('click', () => this.shareProgress());
+        }
+
+        // Refresh data
+        const refreshButton = document.getElementById('refreshData');
+        if (refreshButton) {
+            refreshButton.addEventListener('click', () => this.refreshDashboard());
+        }
+
+        // Theme toggle
+        const themeToggle = document.getElementById('themeToggle');
+        if (themeToggle) {
+            themeToggle.addEventListener('click', () => this.toggleTheme());
+        }
+    }
+
+    handlePeriodChange(event) {
+        const period = event.target.dataset.period;
+        document.querySelectorAll('.period-selector').forEach(btn => {
+            btn.classList.toggle('active', btn === event.target);
+        });
+        
+        // Update charts for selected period
+        this.updateChartsForPeriod(period);
+    }
+
+    showLogModal() {
+        // Create and show modal for logging progress
+        const modal = document.createElement('div');
+        modal.className = 'modal';
+        modal.innerHTML = `
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Log Today's Progress</h3>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="progressForm">
+                        <div class="form-group">
+                            <label for="weight">Weight (lbs)</label>
+                            <input type="number" id="weight" step="0.1" placeholder="Enter your weight">
+                        </div>
+                        <div class="form-group">
+                            <label for="workout">Workout Time (min)</label>
+                            <input type="number" id="workout" placeholder="Enter workout duration">
+                        </div>
+                        <div class="form-group">
+                            <label for="calories">Calories Burned</label>
+                            <input type="number" id="calories" placeholder="Enter calories burned">
+                        </div>
+                        <div class="form-group">
+                            <label for="sleep">Sleep Hours</label>
+                            <input type="number" id="sleep" step="0.1" placeholder="Enter sleep duration">
+                        </div>
+                        <div class="form-group">
+                            <label for="mood">Today's Mood</label>
+                            <select id="mood">
+                                <option value="">Select mood</option>
+                                <option value="1">😞 Poor</option>
+                                <option value="2">😕 Below Average</option>
+                                <option value="3">😐 Average</option>
+                                <option value="4">🙂 Good</option>
+                                <option value="5">😊 Excellent</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="notes">Notes</label>
+                            <textarea id="notes" placeholder="Any notes about today..."></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-secondary" id="cancelLog">Cancel</button>
+                    <button class="btn-primary" id="submitLog">Save Progress</button>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+
+        // Add event listeners for modal
+        modal.querySelector('.modal-close').addEventListener('click', () => modal.remove());
+        modal.querySelector('#cancelLog').addEventListener('click', () => modal.remove());
+        modal.querySelector('#submitLog').addEventListener('click', () => {
+            this.submitProgress();
+            modal.remove();
+        });
+    }
+
+    submitProgress() {
+        const form = document.getElementById('progressForm');
+        if (!form) return;
+
+        const progress = {
+            date: new Date().toISOString().split('T')[0],
+            weight: parseFloat(form.querySelector('#weight').value) || null,
+            workoutTime: parseInt(form.querySelector('#workout').value) || 0,
+            caloriesBurned: parseInt(form.querySelector('#calories').value) || 0,
+            sleepHours: parseFloat(form.querySelector('#sleep').value) || null,
+            mood: parseInt(form.querySelector('#mood').value) || null,
+            notes: form.querySelector('#notes').value || null
+        };
+
+        // Add to progress data
+        this.progressData.push(progress);
+        localStorage.setItem('healthAI_progressData', JSON.stringify(this.progressData));
+
+        // Update dashboard
+        this.refreshDashboard();
+        this.showNotification('Progress logged successfully!', 'success');
+    }
+
+    exportData() {
+        const data = {
+            user: this.userData,
+            progress: this.progressData,
+            goals: this.goals,
+            achievements: this.achievements,
+            exportDate: new Date().toISOString()
+        };
+
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `healthai-progress-${new Date().toISOString().split('T')[0]}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        this.showNotification('Data exported successfully!', 'success');
+    }
+
+    shareProgress() {
+        const stats = this.calculateStats();
+        const text = `Check out my fitness progress! 🎯\n\n` +
+                   `✅ ${stats.consistency}% workout consistency\n` +
+                   `✅ ${Math.abs(stats.currentWeight - stats.startingWeight).toFixed(1)} lbs ${stats.currentWeight < stats.startingWeight ? 'lost' : 'gained'}\n` +
+                   `✅ ${stats.totalWorkouts} workouts completed\n` +
+                   `✅ ${stats.totalCalories.toLocaleString()} calories burned\n\n` +
+                   `Powered by HealthAI 💪`;
+
+        if (navigator.share) {
+            navigator.share({
+                title: 'My HealthAI Progress',
+                text: text,
+                url: window.location.href
+            });
+        } else {
+            navigator.clipboard.writeText(text).then(() => {
+                this.showNotification('Progress summary copied to clipboard!', 'success');
+            });
+        }
+    }
+
+    refreshDashboard() {
+        this.loadUserData();
+        this.updateAllCharts();
+        this.updateDashboard();
+    }
+
+    updateChartsForPeriod(period) {
+        // Update charts based on selected period
+        const data = this.getDataForPeriod(period);
+        
+        // Update each chart
+        Object.keys(this.charts).forEach(chartName => {
+            if (this.charts[chartName] && data[chartName]) {
+                this.charts[chartName].data.datasets[0].data = data[chartName];
+                this.charts[chartName].update();
+            }
+        });
+    }
+
+    updateAllCharts() {
+        Object.values(this.charts).forEach(chart => {
+            if (chart) chart.update();
+        });
+    }
+
+    getDataForPeriod(period) {
+        let days;
+        switch(period) {
+            case 'week': days = 7; break;
+            case 'month': days = 30; break;
+            case 'quarter': days = 90; break;
+            default: days = 7;
+        }
+        
+        const data = this.getLastNDaysData(days);
+        
+        return {
+            weight: data.map(d => d.weight),
+            workout: data.map(d => d.workoutTime),
+            sleep: data.map(d => d.sleepHours),
+            calories: data.map(d => d.caloriesBurned),
+            mood: data.map(d => d.mood)
+        };
+    }
+
+    // ========== THEME MANAGEMENT ==========
+    setupTheme() {
+        const savedTheme = localStorage.getItem('healthAI-theme') || 'light';
+        this.setTheme(savedTheme);
+    }
+
+    setTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem('healthAI-theme', theme);
+        
+        const themeToggle = document.getElementById('themeToggle');
+        if (themeToggle) {
+            themeToggle.innerHTML = theme === 'dark' ? 
+                '<i class="fas fa-sun"></i>' : 
+                '<i class="fas fa-moon"></i>';
+        }
+    }
+
+    toggleTheme() {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        this.setTheme(newTheme);
+    }
+
+    // ========== OFFLINE DETECTION ==========
+    setupOfflineDetection() {
+        window.addEventListener('online', () => {
+            this.showNotification('Back online! Syncing data...', 'info');
+            this.syncOfflineData();
+        });
+
+        window.addEventListener('offline', () => {
+            this.showNotification('You are offline. Data will be saved locally.', 'warning');
+        });
+    }
+
+    syncOfflineData() {
+        // Sync offline data with server
+        console.log('Syncing offline data...');
+        // Implementation would depend on your backend API
+    }
+
+    // ========== NOTIFICATION SYSTEM ==========
+    showNotification(message, type = 'info') {
+        // Remove existing notifications
+        const existing = document.querySelector('.notification');
+        if (existing) existing.remove();
+
+        const notification = document.createElement('div');
+        notification.className = `notification notification-${type}`;
+        notification.innerHTML = `
+            <span>${message}</span>
+            <button class="notification-close">&times;</button>
+        `;
+
+        document.body.appendChild(notification);
+
+        // Auto-remove after 5 seconds
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.style.animation = 'slideOut 0.3s ease-out forwards';
+                setTimeout(() => notification.remove(), 300);
+            }
+        }, 5000);
+
+        // Close button
+        notification.querySelector('.notification-close').addEventListener('click', () => {
+            notification.remove();
+        });
+    }
+
+    // ========== PUBLIC API ==========
+    getProgressData() {
+        return this.progressData;
+    }
+
+    getStats() {
+        return this.calculateStats();
+    }
+
+    addGoal(goal) {
+        this.goals.push(goal);
+        localStorage.setItem('healthAI_goals', JSON.stringify(this.goals));
+        this.updateGoals();
+    }
+
+    updateGoalProgress(goalId, progress) {
+        const goal = this.goals.find(g => g.id === goalId);
+        if (goal) {
+            goal.current = progress;
+            localStorage.setItem('healthAI_goals', JSON.stringify(this.goals));
+            this.updateGoals();
+        }
+    }
+
+    addAchievement(achievement) {
+        this.achievements.push(achievement);
+        localStorage.setItem('healthAI_achievements', JSON.stringify(this.achievements));
+        this.updateAchievements();
+    }
+}
+
+// Initialize dashboard when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    window.HealthAIDashboard = new HealthAIProgressDashboard();
+    
+    // Make dashboard available globally
+    console.log('🏋️‍♂️ HealthAI Progress Dashboard initialized!');
+});
+
+// Export for module usage
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = HealthAIProgressDashboard;
+}
 
     
+
